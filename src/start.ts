@@ -1,7 +1,9 @@
+import * as AWS from 'aws-sdk';
 import * as express from 'express';
 import * as request from 'request';
 
 import * as actions from './actions';
+import * as daos from './dao';
 import * as handlers from './handlers';
 import createLogger from './lib/logger';
 
@@ -17,7 +19,9 @@ async function start(): Promise<void> {
     request.get(PING_URL);
   }, 5 * 60 * 1000); // 5 minutes
 
-  const discordClientActions = new actions.DiscordClientActions();
+  const dynamoDB = new AWS.DynamoDB();
+  const discordBotsDAO = new daos.DiscordBotsDAO(dynamoDB);
+  const discordClientActions = new actions.DiscordClientActions(discordBotsDAO);
 
   const statusHandler = new handlers.StatusHandler();
   const discordClientHandler = new handlers.DiscordClientConfigurationHandler(discordClientActions);
@@ -27,7 +31,7 @@ async function start(): Promise<void> {
   // TODO: Make the handlers own the routes.
   app.get('/status', statusHandler.status);
   app.get('/bot/auth', discordClientHandler.addBotToChannel);
-  app.get('/bot/add', discordClientHandler.startClient);
+  app.get('/bot/add', discordClientHandler.addClient);
 
   // TODO: Logging middleware.
 
