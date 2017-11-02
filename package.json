@@ -7,7 +7,7 @@
   "author": "Jeremy Moseley <jeremy@jeremymoseley.com>",
   "license": "MIT",
   "scripts": {
-    "start": "./node_modules/.bin/tsc && node dist/start.js",
+    "start": "./scripts/start",
     "dev": "forever --minUptime 1000 --spinSleepTime 1000 -c './scripts/start_dev' dist/start.js"
   },
   "dependencies": {
