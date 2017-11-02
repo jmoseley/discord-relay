@@ -12,7 +12,8 @@ export class DiscordClientConfigurationHandler {
   }
 
   /**
-   * Add a bot to a channel. Only needs to be done once.
+   * Helper to add a bot to a channel. Just redirects the users browser to the
+   * discord endpoint.
    */
   public async addBotToChannel(req: Request, res: Response): Promise<void> {
     if (!req.query.clientId) {
@@ -27,7 +28,7 @@ export class DiscordClientConfigurationHandler {
   }
 
   /**
-   * Provide the token to the server and start the discord client.
+   * Starts the discord client using the given token.
    */
   public async startClient(req: Request, res: Response): Promise<void> {
     if (!req.query.botToken) {
