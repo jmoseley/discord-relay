@@ -23,7 +23,7 @@ async function start(): Promise<void> {
   // TODO: Logging middleware.
 
   app.listen(PORT, () => {
-    LOG.info(`Server started on port ${PORT}`);
+    LOG.info(`Server started on port ${PORT}.`);
   });
 }
 
