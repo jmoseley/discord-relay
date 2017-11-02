@@ -1,13 +1,22 @@
 import * as express from 'express';
+import * as request from 'request';
 
 import * as actions from './actions';
 import * as handlers from './handlers';
 import createLogger from './lib/logger';
 
+const PING_URL = 'http://discord-relay.jeremymoseley.net/status';
+
 const PORT = process.env.PORT || 4001;
 const LOG = createLogger('start');
 
 async function start(): Promise<void> {
+  // Self-Ping the app to keep it awake on Heroku.
+  setInterval(() => {
+    LOG.info(`Pinging self.`);
+    request.get(PING_URL);
+  }, 5 * 60 * 1000); // 5 minutes
+
   const discordClientActions = new actions.DiscordClientActions();
 
   const statusHandler = new handlers.StatusHandler();
