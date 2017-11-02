@@ -5,8 +5,7 @@
     ],
     "jsRules": {},
     "rules": {
-        "quotemark": [true, "single", "avoid-escape"],
-        "typedef-whitespace": [false],
+        "quotemark": [true, "single", "avoid-escape"]
     },
     "rulesDirectory": []
 }
