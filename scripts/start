@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -e
+
+nodemon_cmd="./scripts/node_modules/.bin/nodemon"
+if [ ! -f "$nodemon_cmd" ]; then
+  ( cd ./scripts && yarn )
+fi
+
+set -x
+$nodemon_cmd \
+  --ext ts \
+  --watch src \
+  --exec "tsc && node dist/start"
