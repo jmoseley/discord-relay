@@ -1,6 +1,6 @@
 import * as winston from 'winston';
 
-function createTransports(loggerName?:string):winston.TransportInstance[] {
+function createTransports(loggerName?: string): winston.TransportInstance[] {
   const transports = [
     new winston.transports.Console({
       label: loggerName,
@@ -10,7 +10,7 @@ function createTransports(loggerName?:string):winston.TransportInstance[] {
   return transports;
 }
 
-export default function createLogger(name:string):winston.LoggerInstance {
+export default function createLogger(name: string): winston.LoggerInstance {
   if (winston.loggers.has(name)) {
     return winston.loggers.get(name);
   }
