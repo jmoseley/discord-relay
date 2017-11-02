@@ -1,0 +1,13 @@
+{
+  "name": "discord-relay",
+  "version": "0.0.1",
+  "description": "Provide outbound webhooks for Discord messages",
+  "main": "dist/start.js",
+  "repository": "https://github.com/jmoseley/discord-relay.git",
+  "author": "Jeremy Moseley <jeremy@jeremymoseley.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "tslint": "^5.8.0",
+    "typescript": "^2.6.1"
+  }
+}
