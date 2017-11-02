@@ -6,6 +6,9 @@
   "repository": "https://github.com/jmoseley/discord-relay.git",
   "author": "Jeremy Moseley <jeremy@jeremymoseley.com>",
   "license": "MIT",
+  "scripts": {
+    "start": "./scripts/start"
+  },
   "devDependencies": {
     "tslint": "^5.8.0",
     "typescript": "^2.6.1"
