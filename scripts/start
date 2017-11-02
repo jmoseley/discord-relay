@@ -10,4 +10,4 @@ set -x
 $nodemon_cmd \
   --ext ts \
   --watch src \
-  --exec "tsc && node dist/start"
+  --exec "tslint -p tslint.json && tsc && node dist/start"
