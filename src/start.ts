@@ -31,7 +31,7 @@ async function start(): Promise<void> {
   // TODO: Make the handlers own the routes.
   app.get('/status', statusHandler.status);
   app.get('/bot/auth', discordClientHandler.addBotToChannel);
-  app.get('/bot/add', discordClientHandler.addClient);
+  app.post('/bot/add', discordClientHandler.addClient);
 
   // TODO: Logging middleware.
 
