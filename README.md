@@ -1,9 +1,21 @@
 # discord-relay
 Relay for outbound webhooks for Discord messages.
 
-
-## Running Locally
+## Install Deps
 
 1. Install yarn
 1. Install modules: `yarn`
-1. Start the server: `yarn start`
+
+## Running the Service
+
+```bash
+yarn start
+```
+
+## Local Development
+
+Uses `forever` and `nodemon` to restart after changes and errors.
+
+```bash
+yarn dev
+```
