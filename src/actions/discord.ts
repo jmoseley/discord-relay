@@ -1,13 +1,13 @@
-import * as Discord from 'discord.js';
 import * as _ from 'lodash';
 
 import { DiscordBotsDAO } from '../dao';
+import DiscordMessageHandler from '../lib/discord';
 import createLogger from '../lib/logger';
 
 const LOG = createLogger('DiscordClientActions');
 
 export class DiscordClientActions {
-  private activeClients: Discord.Client[];
+  private activeClients: DiscordMessageHandler[];
 
   constructor(private readonly discordBotDao: DiscordBotsDAO) {
     this.activeClients = [];
@@ -15,31 +15,32 @@ export class DiscordClientActions {
 
   // TODO: Move this into a worker.
   public async startPersistedClients(): Promise<void> {
-    const clientTokens = await this.discordBotDao.getAllBotTokens();
+    const clients = await this.discordBotDao.getAllBotHooks();
 
-    this.activeClients = await Promise.all(clientTokens.map(this.startClient));
+    this.activeClients = _.compact(await Promise.all(
+      clients.map(client => this.startClient(client.token, client.webhookUrl))));
   }
 
-  public async addClient(token: string): Promise<void> {
-    await this.discordBotDao.addToken(token);
-    this.activeClients.push(await this.startClient(token));
+  public async addClient(token: string, webhookUrl: string): Promise<void> {
+    await this.discordBotDao.addToken(token, webhookUrl);
+    const client = await this.startClient(token, webhookUrl);
+    if (client) {
+      this.activeClients.push(client);
+    }
   }
 
   // TODO: Move this into a worker.
-  private async startClient(token: string): Promise<Discord.Client> {
+  private async startClient(token: string, webhookUrl: string): Promise<DiscordMessageHandler | null> {
     LOG.info(`Starting client for token ${_.truncate(token, { length: 10 })}`);
-    const client = new Discord.Client();
+    if (!webhookUrl) {
+      LOG.info(`Not starting client for token ` +
+        `${_.truncate(token, { length: 10 })} because there is no matching webhook.`);
+      return null;
+    }
 
-    client.on('ready', () => {
-      LOG.info(`Discord Client is ready.`);
-    });
+    const messageHandler = new DiscordMessageHandler(token, webhookUrl);
+    await messageHandler.start();
 
-    client.on('message', (message: string) => {
-      LOG.info(`Got a message: '${message}' for token ${_.truncate(token, { length: 10 })}`);
-    });
-
-    await client.login(token);
-
-    return client;
+    return messageHandler;
   }
 }

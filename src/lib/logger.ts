@@ -18,3 +18,5 @@ export default function createLogger(name: string): winston.LoggerInstance {
     transports: createTransports(name),
   });
 }
+
+export { LoggerInstance as Logger } from 'winston';

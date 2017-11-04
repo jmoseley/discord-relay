@@ -1,7 +1,7 @@
 import * as AWS from 'aws-sdk';
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
-import * as request from 'request';
+import * as request from 'request-promise-native';
 
 import * as actions from './actions';
 import * as daos from './dao';
@@ -20,7 +20,9 @@ async function start(): Promise<void> {
   // Self-Ping the app to keep it awake on Heroku.
   setInterval(() => {
     LOG.info(`Pinging self.`);
-    request.get(PING_URL);
+    request.get(PING_URL).catch((err: any) => {
+      LOG.error(`Error pinging self: ${err}`);
+    });
   }, 5 * 60 * 1000); // 5 minutes
 
   const dynamoDB = new AWS.DynamoDB({

@@ -31,12 +31,12 @@ export class DiscordClientConfigurationHandler {
    * Starts the discord client using the given token.
    */
   public async addClient(req: Request, res: Response): Promise<void> {
-    if (!req.body.botToken) {
+    if (!req.body.botToken || !req.body.webhookUrl) {
       // TODO: Generic error handling.
-      res.status(400).send('"botToken" is required.');
+      res.status(400).send('"botToken" and "webhookUrl" are required.');
       return;
     }
-    await this.discordActions.addClient(req.body.botToken);
+    await this.discordActions.addClient(req.body.botToken, req.body.webhookUrl);
     res.send('success');
   }
 }
