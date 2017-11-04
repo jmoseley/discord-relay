@@ -25,6 +25,7 @@ export class DiscordClientActions {
 
   // TODO: Move this into a worker.
   private async startClient(token: string): Promise<Discord.Client> {
+    LOG.info(`Starting client for token ${_.truncate(token, { length: 5 })}`);
     const client = new Discord.Client();
 
     client.on('ready', () => {
