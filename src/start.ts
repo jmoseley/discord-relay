@@ -1,11 +1,13 @@
 import * as AWS from 'aws-sdk';
 import * as bodyParser from 'body-parser';
+import * as cookieParser from 'cookie-parser';
 import * as express from 'express';
 import * as request from 'request-promise-native';
 
 import * as actions from './actions';
 import * as daos from './dao';
 import * as handlers from './handlers';
+import AuthProvider from './lib/auth_provider';
 import createLogger from './lib/logger';
 
 // I suck at types.
@@ -40,6 +42,8 @@ async function start(): Promise<void> {
   const discordBotsDAO = new daos.DiscordBotsDAO(dynamoDB);
   const discordClientActions = new actions.DiscordClientActions(discordBotsDAO);
 
+  const authProvider = new AuthProvider();
+
   const statusHandler = new handlers.StatusHandler();
   const discordClientHandler = new handlers.DiscordClientConfigurationHandler(discordClientActions);
   const pageHandler = new handlers.PageHandler(DISCORD_CLIENT_ID, DISCORD_OAUTH_REDIRECT_URI);
@@ -48,6 +52,8 @@ async function start(): Promise<void> {
   LOG.info('Starting discord-relay');
   const app: express.Application = express();
   app.set('view engine', 'pug');
+  app.use(cookieParser());
+  app.use(authProvider.middleware());
   app.use(bodyParser.urlencoded({
     extended: true,
     limit: '20mb',

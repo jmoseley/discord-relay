@@ -10,6 +10,7 @@ const LOG = createLogger('OAuthHandler');
 
 export class OAuthHandler {
   constructor(
+    // private readonly authProvider: AuthProvider,
     private readonly clientId?: string,
     private readonly clientSecret?: string,
     private readonly oauthRedirectUri?: string,
@@ -39,6 +40,6 @@ export class OAuthHandler {
 
     // TODO: Store the results in a cookie.
 
-    res.send(200);
+    res.redirect(302, '/');
   }
 }
