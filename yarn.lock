@@ -241,7 +241,7 @@ block-stream@*:
   dependencies:
     inherits "~2.0.0"
 
-body-parser@1.18.2:
+body-parser@1.18.2, body-parser@^1.18.2:
   version "1.18.2"
   resolved "https://registry.yarnpkg.com/body-parser/-/body-parser-1.18.2.tgz#87678a19d84b47d859b83199bd59bce222b10454"
   dependencies:
@@ -1101,7 +1101,7 @@ lazy@~1.0.11:
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/lazy/-/lazy-1.0.11.tgz#daa068206282542c088288e975c297c1ae77b690"
 
-lodash@^4.0.0, lodash@^4.17.4:
+lodash@^4.0.0, lodash@^4.13.1, lodash@^4.17.4:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
 

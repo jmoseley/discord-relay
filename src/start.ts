@@ -1,4 +1,5 @@
 import * as AWS from 'aws-sdk';
+import * as bodyParser from 'body-parser';
 import * as express from 'express';
 import * as request from 'request';
 
@@ -33,6 +34,11 @@ async function start(): Promise<void> {
   LOG.info('Starting discord-relay');
   const app: express.Application = express();
   app.use(middleware.reportErrorsMiddleware);
+  app.use(bodyParser.urlencoded({
+    extended: true,
+    limit: '20mb',
+  }));
+  app.use(bodyParser.json({ limit: '20mb' }));
 
   const router = Router();
   // TODO: Make the handlers own the routes.

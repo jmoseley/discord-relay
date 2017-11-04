@@ -1,5 +1,6 @@
 import * as AWS from 'aws-sdk';
 import * as _ from 'lodash';
+import * as autobind from 'protobind';
 
 import createLogger from '../lib/logger';
 
