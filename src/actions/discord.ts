@@ -11,6 +11,7 @@ export class DiscordClientActions {
 
   constructor(private readonly discordBotDao: DiscordBotsDAO) {}
 
+  // TODO: Move this into a worker.
   public async startPersistedClients(): Promise<void> {
     const clientTokens = await this.discordBotDao.getAllBotTokens();
 
@@ -18,11 +19,11 @@ export class DiscordClientActions {
   }
 
   public async addClient(token: string): Promise<void> {
-    // TODO: Persist the new client.
-
+    await this.discordBotDao.addToken(token);
     this.activeClients.push(await this.startClient(token));
   }
 
+  // TODO: Move this into a worker.
   private async startClient(token: string): Promise<Discord.Client> {
     const client = new Discord.Client();
 
