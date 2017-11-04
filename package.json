@@ -28,6 +28,7 @@
     "express-promise-router": "^2.0.0",
     "forever": "^0.15.3",
     "lodash": "^4.17.4",
+    "moment": "^2.19.1",
     "protobind": "^1.0.7",
     "pug": "^2.0.0-rc.4",
     "request": "^2.83.0",

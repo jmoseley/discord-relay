@@ -42,12 +42,17 @@ async function start(): Promise<void> {
   const discordBotsDAO = new daos.DiscordBotsDAO(dynamoDB);
   const discordClientActions = new actions.DiscordClientActions(discordBotsDAO);
 
-  const authProvider = new AuthProvider();
+  const authProvider = new AuthProvider(dynamoDB);
 
   const statusHandler = new handlers.StatusHandler();
   const discordClientHandler = new handlers.DiscordClientConfigurationHandler(discordClientActions);
   const pageHandler = new handlers.PageHandler(DISCORD_CLIENT_ID, DISCORD_OAUTH_REDIRECT_URI);
-  const oauthHandler = new handlers.OAuthHandler(DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_OAUTH_REDIRECT_URI);
+  const oauthHandler = new handlers.OAuthHandler(
+    authProvider,
+    DISCORD_CLIENT_ID,
+    DISCORD_CLIENT_SECRET,
+    DISCORD_OAUTH_REDIRECT_URI,
+  );
 
   LOG.info('Starting discord-relay');
   const app: express.Application = express();
