@@ -1,0 +1,19 @@
+html
+  head
+    link(rel='stylesheet' href='styles/index.css')
+    link(rel='icon' type='image/png' sizes='32x32' href='/favicon-32x32.png')
+    link(rel='icon' type='image/png' sizes='16x16' href='/favicon-16x16.png')
+    link(rel='manifest' href='/manifest.json')
+    link(rel='mask-icon' href='/safari-pinned-tab.svg' color='#5bbad5')
+    title Discord Relay
+  body
+    h1 Discord Relay
+    p
+      | This is a service that provides outgoing webhooks for 
+      a(href='http://www.discordapp.com') Discord
+      | , allowing for event driven bot integration.
+    h2 Login With Discord
+    a(href=`https://discordapp.com/api/oauth2/authorize?${oauthParams}`)
+      img.discord_logo(src='https://discordapp.com/assets/94db9c3c1eba8a38a1fcf4f223294185.png')
+
+
