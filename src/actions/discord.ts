@@ -35,7 +35,7 @@ export class DiscordClientActions {
     });
 
     client.on('message', (message: string) => {
-      LOG.info(`Got a message: ${message} for token ${_.truncate(token, { length: 10 })}`);
+      LOG.info(`Got a message: '${message}' for token ${_.truncate(token, { length: 10 })}`);
     });
 
     await client.login(token);

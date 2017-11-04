@@ -15,7 +15,9 @@ export class DiscordBotsDAO {
 
   public async getAllBotTokens(): Promise<string[]> {
     // TODO: Typing.
-    const tokensResult = await this.dynamoDB.scan().promise();
+    const tokensResult = await this.dynamoDB.scan({
+      TableName: TABLE_NAME,
+    }).promise();
 
     return _.map(tokensResult.Items, (item: any) => item.token.S);
   }

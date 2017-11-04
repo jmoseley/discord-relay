@@ -50,11 +50,11 @@ async function start(): Promise<void> {
 
   app.use(router);
 
-  // TODO: Logging middleware.
-
   app.listen(PORT, () => {
     LOG.info(`Server started on port ${PORT}.`);
   });
+
+  await discordClientActions.startPersistedClients();
 }
 
 start().catch((error: any) => {
