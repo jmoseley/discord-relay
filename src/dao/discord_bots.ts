@@ -11,7 +11,13 @@ export class DiscordBotsDAO {
   constructor(private readonly dynamoDB: AWS.DynamoDB) {}
 
   public async getAllBotTokens(): Promise<string[]> {
-    return [];
+    // TODO: Typing.
+    const tokensResult = await this.dynamoDB.scan().promise();
+
+    return _(tokensResult.Items)
+      .map((item) => item.token.S)
+      .compact()
+      .value();
   }
 
   public async addToken(token: string): Promise<void> {
