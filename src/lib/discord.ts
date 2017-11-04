@@ -36,6 +36,7 @@ export default class DiscordMessageHandler {
       const updatedUrl = this.appendMessageToUrl(this.webhookUrl, message, messageId);
 
       // Don't use await since the on handler dosen't support it.
+      // TODO: Put this in a queue.
       request.get({
         url: updatedUrl,
       }).then(() => {
