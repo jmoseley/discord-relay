@@ -1,4 +1,5 @@
 import * as Discord from 'discord.js';
+import * as _ from 'lodash';
 
 import { DiscordBotsDAO } from '../dao';
 import createLogger from '../lib/logger';
@@ -8,8 +9,11 @@ const LOG = createLogger('DiscordClientActions');
 export class DiscordClientActions {
   private activeClients: Discord.Client[];
 
-  constructor(private readonly discordBotDao: DiscordBotsDAO) {}
+  constructor(private readonly discordBotDao: DiscordBotsDAO) {
+    this.activeClients = [];
+  }
 
+  // TODO: Move this into a worker.
   public async startPersistedClients(): Promise<void> {
     const clientTokens = await this.discordBotDao.getAllBotTokens();
 
@@ -17,12 +21,13 @@ export class DiscordClientActions {
   }
 
   public async addClient(token: string): Promise<void> {
-    // TODO: Persist the new client.
-
+    await this.discordBotDao.addToken(token);
     this.activeClients.push(await this.startClient(token));
   }
 
+  // TODO: Move this into a worker.
   private async startClient(token: string): Promise<Discord.Client> {
+    LOG.info(`Starting client for token ${_.truncate(token, { length: 10 })}`);
     const client = new Discord.Client();
 
     client.on('ready', () => {
@@ -30,7 +35,7 @@ export class DiscordClientActions {
     });
 
     client.on('message', (message: string) => {
-      LOG.info(`Got a message: ${message} for token ${token}`);
+      LOG.info(`Got a message: '${message}' for token ${_.truncate(token, { length: 10 })}`);
     });
 
     await client.login(token);

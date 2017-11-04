@@ -1,10 +1,10 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import * as autobind from 'protobind';
 
 import { DiscordClientActions } from '../actions';
 import createLogger from '../lib/logger';
 
-const LOG = createLogger('AuthHandler');
+const LOG = createLogger('BotClientConfigurationHandler');
 
 export class DiscordClientConfigurationHandler {
   constructor(private readonly discordActions: DiscordClientActions) {
@@ -13,7 +13,7 @@ export class DiscordClientConfigurationHandler {
 
   /**
    * Helper to add a bot to a channel. Just redirects the users browser to the
-   * discord endpoint.
+   * discord oauth endpoint.
    */
   public async addBotToChannel(req: Request, res: Response): Promise<void> {
     if (!req.query.clientId) {

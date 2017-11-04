@@ -1,4 +1,5 @@
 import * as AWS from 'aws-sdk';
+import * as bodyParser from 'body-parser';
 import * as express from 'express';
 import * as request from 'request';
 
@@ -6,6 +7,9 @@ import * as actions from './actions';
 import * as daos from './dao';
 import * as handlers from './handlers';
 import createLogger from './lib/logger';
+
+// I suck at types.
+const Router: any = require('express-promise-router');
 
 const PING_URL = 'http://discord-relay.jeremymoseley.net/status';
 
@@ -19,7 +23,9 @@ async function start(): Promise<void> {
     request.get(PING_URL);
   }, 5 * 60 * 1000); // 5 minutes
 
-  const dynamoDB = new AWS.DynamoDB();
+  const dynamoDB = new AWS.DynamoDB({
+    region: 'us-west-2',
+  });
   const discordBotsDAO = new daos.DiscordBotsDAO(dynamoDB);
   const discordClientActions = new actions.DiscordClientActions(discordBotsDAO);
 
@@ -28,16 +34,27 @@ async function start(): Promise<void> {
 
   LOG.info('Starting discord-relay');
   const app: express.Application = express();
-  // TODO: Make the handlers own the routes.
-  app.get('/status', statusHandler.status);
-  app.get('/bot/auth', discordClientHandler.addBotToChannel);
-  app.post('/bot/add', discordClientHandler.addClient);
+  app.use(bodyParser.urlencoded({
+    extended: true,
+    limit: '20mb',
+  }));
+  app.use(bodyParser.json({ limit: '20mb' }));
 
-  // TODO: Logging middleware.
+  // TODO: Pretty error middleware.
+
+  const router = Router();
+  // TODO: Make the handlers own the routes.
+  router.get('/status', statusHandler.status);
+  router.get('/bot/auth', discordClientHandler.addBotToChannel);
+  router.post('/bot/add', discordClientHandler.addClient);
+
+  app.use(router);
 
   app.listen(PORT, () => {
     LOG.info(`Server started on port ${PORT}.`);
   });
+
+  await discordClientActions.startPersistedClients();
 }
 
 start().catch((error: any) => {
