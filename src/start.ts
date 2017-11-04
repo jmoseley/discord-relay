@@ -7,7 +7,6 @@ import * as actions from './actions';
 import * as daos from './dao';
 import * as handlers from './handlers';
 import createLogger from './lib/logger';
-import * as middleware from './lib/middleware';
 
 // I suck at types.
 const Router: any = require('express-promise-router');
@@ -35,12 +34,13 @@ async function start(): Promise<void> {
 
   LOG.info('Starting discord-relay');
   const app: express.Application = express();
-  app.use(middleware.reportErrorsMiddleware);
   app.use(bodyParser.urlencoded({
     extended: true,
     limit: '20mb',
   }));
   app.use(bodyParser.json({ limit: '20mb' }));
+
+  // TODO: Pretty error middleware.
 
   const router = Router();
   // TODO: Make the handlers own the routes.
