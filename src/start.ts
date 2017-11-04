@@ -8,6 +8,9 @@ import * as handlers from './handlers';
 import createLogger from './lib/logger';
 import * as middleware from './lib/middleware';
 
+// I suck at types.
+const Router: any = require('express-promise-router');
+
 const PING_URL = 'http://discord-relay.jeremymoseley.net/status';
 
 const PORT = process.env.PORT || 4001;
@@ -30,10 +33,14 @@ async function start(): Promise<void> {
   LOG.info('Starting discord-relay');
   const app: express.Application = express();
   app.use(middleware.reportErrorsMiddleware);
+
+  const router = Router();
   // TODO: Make the handlers own the routes.
-  app.get('/status', statusHandler.status);
-  app.get('/bot/auth', discordClientHandler.addBotToChannel);
-  app.post('/bot/add', discordClientHandler.addClient);
+  router.get('/status', statusHandler.status);
+  router.get('/bot/auth', discordClientHandler.addBotToChannel);
+  router.post('/bot/add', discordClientHandler.addClient);
+
+  app.use(router);
 
   // TODO: Logging middleware.
 

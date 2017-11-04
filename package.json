@@ -20,6 +20,7 @@
     "discord.js": "^11.2.1",
     "erlpack": "hammerandchisel/erlpack",
     "express": "^4.16.2",
+    "express-promise-router": "^2.0.0",
     "forever": "^0.15.3",
     "lodash": "^4.17.4",
     "protobind": "^1.0.7",

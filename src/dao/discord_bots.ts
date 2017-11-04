@@ -21,7 +21,8 @@ export class DiscordBotsDAO {
   }
 
   public async addToken(token: string): Promise<void> {
-    LOG.info(`Saving token ${_.truncate(token, { length: 5 })}`);
+    // TODO: Encrypt the token.
+    LOG.info(`Saving token ${_.truncate(token, { length: 10 })}`);
     await this.dynamoDB.putItem({
       Item: {
        token: {

@@ -25,7 +25,7 @@ export class DiscordClientActions {
 
   // TODO: Move this into a worker.
   private async startClient(token: string): Promise<Discord.Client> {
-    LOG.info(`Starting client for token ${_.truncate(token, { length: 5 })}`);
+    LOG.info(`Starting client for token ${_.truncate(token, { length: 10 })}`);
     const client = new Discord.Client();
 
     client.on('ready', () => {
@@ -33,7 +33,7 @@ export class DiscordClientActions {
     });
 
     client.on('message', (message: string) => {
-      LOG.info(`Got a message: ${message} for token ${_.truncate(token, { length: 5 })}`);
+      LOG.info(`Got a message: ${message} for token ${_.truncate(token, { length: 10 })}`);
     });
 
     await client.login(token);
