@@ -9,7 +9,9 @@ const LOG = createLogger('DiscordClientActions');
 export class DiscordClientActions {
   private activeClients: Discord.Client[];
 
-  constructor(private readonly discordBotDao: DiscordBotsDAO) {}
+  constructor(private readonly discordBotDao: DiscordBotsDAO) {
+    this.activeClients = [];
+  }
 
   // TODO: Move this into a worker.
   public async startPersistedClients(): Promise<void> {

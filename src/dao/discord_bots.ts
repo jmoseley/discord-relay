@@ -9,16 +9,15 @@ const LOG = createLogger('DiscordBotsDAO');
 const TABLE_NAME = 'DiscordRelay.Bots';
 
 export class DiscordBotsDAO {
-  constructor(private readonly dynamoDB: AWS.DynamoDB) {}
+  constructor(private readonly dynamoDB: AWS.DynamoDB) {
+    autobind(this);
+  }
 
   public async getAllBotTokens(): Promise<string[]> {
     // TODO: Typing.
     const tokensResult = await this.dynamoDB.scan().promise();
 
-    return _(tokensResult.Items)
-      .map((item) => item.token.S)
-      .compact()
-      .value();
+    return _.map(tokensResult.Items, (item: any) => item.token.S);
   }
 
   public async addToken(token: string): Promise<void> {
