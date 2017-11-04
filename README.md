@@ -9,11 +9,9 @@ Helper to get a bot added to a channel. Redirects to the Discord OAuth endpoint.
 
 ### POST /bot/add
 
-Include `botToken` in the POST body. This is the token of your bot.
+Include `botToken` and `webhookUrl` in the POST body. This is the token of your bot.
 
 This adds your bot to the server and makes it begin listening to messages.
-
-TODO: Do something with the messages.
 
 ## Install Deps
 
