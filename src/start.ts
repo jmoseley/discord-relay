@@ -6,6 +6,7 @@ import * as actions from './actions';
 import * as daos from './dao';
 import * as handlers from './handlers';
 import createLogger from './lib/logger';
+import * as middleware from './lib/middleware';
 
 const PING_URL = 'http://discord-relay.jeremymoseley.net/status';
 
@@ -28,6 +29,7 @@ async function start(): Promise<void> {
 
   LOG.info('Starting discord-relay');
   const app: express.Application = express();
+  app.use(middleware.reportErrorsMiddleware);
   // TODO: Make the handlers own the routes.
   app.get('/status', statusHandler.status);
   app.get('/bot/auth', discordClientHandler.addBotToChannel);

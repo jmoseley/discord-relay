@@ -13,7 +13,7 @@ export class DiscordClientConfigurationHandler {
 
   /**
    * Helper to add a bot to a channel. Just redirects the users browser to the
-   * discord endpoint.
+   * discord oauth endpoint.
    */
   public async addBotToChannel(req: Request, res: Response): Promise<void> {
     if (!req.query.clientId) {
