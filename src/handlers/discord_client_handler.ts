@@ -1,10 +1,10 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import * as autobind from 'protobind';
 
 import { DiscordClientActions } from '../actions';
 import createLogger from '../lib/logger';
 
-const LOG = createLogger('AuthHandler');
+const LOG = createLogger('BotClientConfigurationHandler');
 
 export class DiscordClientConfigurationHandler {
   constructor(private readonly discordActions: DiscordClientActions) {
