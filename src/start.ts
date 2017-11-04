@@ -36,11 +36,14 @@ async function start(): Promise<void> {
 
   LOG.info('Starting discord-relay');
   const app: express.Application = express();
+  app.set('view engine', 'pug');
   app.use(bodyParser.urlencoded({
     extended: true,
     limit: '20mb',
   }));
   app.use(bodyParser.json({ limit: '20mb' }));
+  app.use(express.static('./public'));
+  app.set('views', './views');
 
   // TODO: Pretty error middleware.
 
