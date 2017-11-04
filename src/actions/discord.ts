@@ -1,13 +1,13 @@
-import * as Discord from 'discord.js';
 import * as _ from 'lodash';
 
 import { DiscordBotsDAO } from '../dao';
+import DiscordMessageHandler from '../lib/discord';
 import createLogger from '../lib/logger';
 
 const LOG = createLogger('DiscordClientActions');
 
 export class DiscordClientActions {
-  private activeClients: Discord.Client[];
+  private activeClients: DiscordMessageHandler[];
 
   constructor(private readonly discordBotDao: DiscordBotsDAO) {
     this.activeClients = [];
@@ -30,25 +30,17 @@ export class DiscordClientActions {
   }
 
   // TODO: Move this into a worker.
-  private async startClient(token: string, webhookUrl: string): Promise<Discord.Client | null> {
+  private async startClient(token: string, webhookUrl: string): Promise<DiscordMessageHandler | null> {
     LOG.info(`Starting client for token ${_.truncate(token, { length: 10 })}`);
     if (!webhookUrl) {
       LOG.info(`Not starting client for token ` +
         `${_.truncate(token, { length: 10 })} because there is no matching webhook.`);
       return null;
     }
-    const client = new Discord.Client();
 
-    client.on('ready', () => {
-      LOG.info(`Discord Client is ready.`);
-    });
+    const messageHandler = new DiscordMessageHandler(token, webhookUrl);
+    await messageHandler.start();
 
-    client.on('message', (message: string) => {
-      LOG.info(`Got a message: '${message}' for token ${_.truncate(token, { length: 10 })}`);
-    });
-
-    await client.login(token);
-
-    return client;
+    return messageHandler;
   }
 }
