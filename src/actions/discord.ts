@@ -1,4 +1,5 @@
 import * as Discord from 'discord.js';
+import * as _ from 'lodash';
 
 import { DiscordBotsDAO } from '../dao';
 import createLogger from '../lib/logger';
@@ -30,7 +31,7 @@ export class DiscordClientActions {
     });
 
     client.on('message', (message: string) => {
-      LOG.info(`Got a message: ${message} for token ${token}`);
+      LOG.info(`Got a message: ${message} for token ${_.truncate(token, { length: 5 })}`);
     });
 
     await client.login(token);
