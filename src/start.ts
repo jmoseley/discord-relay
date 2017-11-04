@@ -21,6 +21,7 @@ const LOG = createLogger('start');
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
 const DISCORD_OAUTH_REDIRECT_URI = process.env.DISCORD_OAUTH_REDIRECT_URI;
+const COOKIE_SECRET = process.env.COOKIE_SECRET;
 
 async function start(): Promise<void> {
   if (!DISCORD_CLIENT_ID || !DISCORD_CLIENT_SECRET || !DISCORD_OAUTH_REDIRECT_URI) {
@@ -57,7 +58,7 @@ async function start(): Promise<void> {
   LOG.info('Starting discord-relay');
   const app: express.Application = express();
   app.set('view engine', 'pug');
-  app.use(cookieParser());
+  app.use(cookieParser(COOKIE_SECRET));
   app.use(authProvider.middleware());
   app.use(bodyParser.urlencoded({
     extended: true,
