@@ -24,7 +24,9 @@ async function start(): Promise<void> {
     request.get(PING_URL);
   }, 5 * 60 * 1000); // 5 minutes
 
-  const dynamoDB = new AWS.DynamoDB();
+  const dynamoDB = new AWS.DynamoDB({
+    region: 'us-west-2',
+  });
   const discordBotsDAO = new daos.DiscordBotsDAO(dynamoDB);
   const discordClientActions = new actions.DiscordClientActions(discordBotsDAO);
 
