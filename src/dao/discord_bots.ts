@@ -8,6 +8,7 @@ const LOG = createLogger('DiscordBotsDAO');
 
 const TABLE_NAME = 'DiscordRelay.Bots';
 
+// TODO: Build a DAO helper that handles conversion to dynamo DB and back.
 export class DiscordBotsDAO {
   constructor(private readonly dynamoDB: AWS.DynamoDB) {
     autobind(this);
@@ -27,11 +28,14 @@ export class DiscordBotsDAO {
 
   public async addToken(token: string, webhookUrl: string): Promise<void> {
     // TODO: Encrypt the token.
-    LOG.info(`Saving token ${_.truncate(token, { length: 10 })}`);
+    LOG.info(`Saving token ${_.truncate(token, { length: 10 })} with webhook ${webhookUrl}`);
     await this.dynamoDB.putItem({
       Item: {
        token: {
          S: token,
+       },
+       webhookUrl: {
+         S: webhookUrl,
        },
       },
       TableName: TABLE_NAME,
