@@ -1,5 +1,6 @@
 import * as AWS from 'aws-sdk';
 import { NextFunction, Request, Response } from 'express';
+import * as _ from 'lodash';
 import * as uuid from 'uuid';
 
 import createLogger from './logger';
@@ -34,7 +35,8 @@ export default class AuthProvider {
 
   public middleware() {
     return (req: Request, response: Response, next: NextFunction) => {
-      LOG.info(`AuthMiddle`);
+      const userId = _.get(req.signedCookies, 'userId');
+      LOG.info(`Found userId in cookie ${userId}`);
       next();
     };
   }

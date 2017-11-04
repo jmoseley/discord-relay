@@ -61,8 +61,9 @@ export class OAuthHandler {
     });
 
     res
-      .cookie('userId', user.userId)
-      .cookie('username', user.username)
+      .cookie('userId', user.userId, {
+        signed: true,
+      })
       .redirect(302, '/');
   }
 }
