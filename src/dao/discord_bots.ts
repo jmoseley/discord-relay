@@ -13,16 +13,19 @@ export class DiscordBotsDAO {
     autobind(this);
   }
 
-  public async getAllBotTokens(): Promise<string[]> {
+  public async getAllBotHooks(): Promise<Array<{ token: string, webhookUrl: string }>> {
     // TODO: Typing.
     const tokensResult = await this.dynamoDB.scan({
       TableName: TABLE_NAME,
     }).promise();
 
-    return _.map(tokensResult.Items, (item: any) => item.token.S);
+    return _.map(tokensResult.Items, (item: any) => ({
+      token: _.get(item.token, 'S'),
+      webhookUrl: _.get(item.webhookUrl, 'S'),
+    }));
   }
 
-  public async addToken(token: string): Promise<void> {
+  public async addToken(token: string, webhookUrl: string): Promise<void> {
     // TODO: Encrypt the token.
     LOG.info(`Saving token ${_.truncate(token, { length: 10 })}`);
     await this.dynamoDB.putItem({

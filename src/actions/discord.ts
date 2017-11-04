@@ -15,19 +15,28 @@ export class DiscordClientActions {
 
   // TODO: Move this into a worker.
   public async startPersistedClients(): Promise<void> {
-    const clientTokens = await this.discordBotDao.getAllBotTokens();
+    const clients = await this.discordBotDao.getAllBotHooks();
 
-    this.activeClients = await Promise.all(clientTokens.map(this.startClient));
+    this.activeClients = _.compact(await Promise.all(
+      clients.map(client => this.startClient(client.token, client.webhookUrl))));
   }
 
-  public async addClient(token: string): Promise<void> {
-    await this.discordBotDao.addToken(token);
-    this.activeClients.push(await this.startClient(token));
+  public async addClient(token: string, webhookUrl: string): Promise<void> {
+    await this.discordBotDao.addToken(token, webhookUrl);
+    const client = await this.startClient(token, webhookUrl);
+    if (client) {
+      this.activeClients.push(client);
+    }
   }
 
   // TODO: Move this into a worker.
-  private async startClient(token: string): Promise<Discord.Client> {
+  private async startClient(token: string, webhookUrl: string): Promise<Discord.Client | null> {
     LOG.info(`Starting client for token ${_.truncate(token, { length: 10 })}`);
+    if (!webhookUrl) {
+      LOG.info(`Not starting client for token ` +
+        `${_.truncate(token, { length: 10 })} because there is no matching webhook.`);
+      return null;
+    }
     const client = new Discord.Client();
 
     client.on('ready', () => {
