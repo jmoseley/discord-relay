@@ -21,8 +21,8 @@ export class DiscordClientActions {
       clients.map(client => this.startClient(client.token, client.webhookUrl))));
   }
 
-  public async addClient(token: string, webhookUrl: string): Promise<void> {
-    await this.discordBotDao.addToken(token, webhookUrl);
+  public async addClient(token: string, webhookUrl: string, userId: string): Promise<void> {
+    await this.discordBotDao.addToken(token, webhookUrl, userId);
     const client = await this.startClient(token, webhookUrl);
     if (client) {
       this.activeClients.push(client);

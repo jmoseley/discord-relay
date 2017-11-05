@@ -26,13 +26,16 @@ export class DiscordBotsDAO {
     }));
   }
 
-  public async addToken(token: string, webhookUrl: string): Promise<void> {
+  public async addToken(token: string, webhookUrl: string, userId: string): Promise<void> {
     // TODO: Encrypt the token.
     LOG.info(`Saving token ${_.truncate(token, { length: 10 })} with webhook ${webhookUrl}`);
     await this.dynamoDB.putItem({
       Item: {
        token: {
          S: token,
+       },
+       userId: {
+         S: userId,
        },
        webhookUrl: {
          S: webhookUrl,
