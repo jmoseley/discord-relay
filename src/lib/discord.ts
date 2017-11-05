@@ -4,6 +4,7 @@ import * as request from 'request-promise-native';
 import * as url from 'url';
 import * as uuid from 'uuid';
 
+import { IToken } from '../actions/discord';
 import createLogger, { Logger } from './logger';
 
 export default class DiscordMessageHandler {
@@ -11,18 +12,16 @@ export default class DiscordMessageHandler {
   private log: Logger;
 
   constructor(
-    private readonly token: string,
-    private readonly webhookUrl: string,
-    public readonly tokenId: string,
+    public readonly token: IToken,
   ) {
-    this.log = createLogger(`DiscordMessageHandler(${token})`);
+    this.log = createLogger(`DiscordMessageHandler(${token.token})`);
     this.discordClient = new Discord.Client();
 
     this.configureClient();
   }
 
   public async start() {
-    await this.discordClient.login(this.token);
+    await this.discordClient.login(this.token.token);
   }
 
   public async stop() {
@@ -40,29 +39,27 @@ export default class DiscordMessageHandler {
       message = message.toString();
       const messageId = uuid.v4();
 
-      this.log.info(`${messageId}: Triggering webhook for message '${message}' to '${this.webhookUrl}'`);
+      this.log.info(`${messageId}: Triggering webhook for message '${message}' to '${this.token.webhookUri}'`);
 
-      const updatedUrl = this.appendMessageToUrl(this.webhookUrl, message, messageId);
+      let body: any;
+      let qs: any;
+      if (this.token.method === 'POST') {
+        body = {};
+        body.message = message;
+        body.messageId = messageId;
+      }
+      if (this.token.method === 'GET') {
+        qs = {};
+        qs.message = message;
+        qs.messageId = messageId;
+      }
 
-      // Don't use await since the on handler dosen't support it.
-      // TODO: Put this in a queue.
-      request.get({
-        url: updatedUrl,
-      }).then(() => {
-        this.log.info(`${messageId}: Finished calling webhook.`);
-      }).catch((err: any) => {
-        this.log.error(`${messageId}: Error handling webhook:\nWebhook URL: ${updatedUrl}\nError:\n${err}`);
+      request(this.token.webhookUri, {
+        body,
+        headers: this.token.headers,
+        method: this.token.method,
+        qs,
       });
     });
-  }
-
-  private appendMessageToUrl(urlString: string, message: string, messageId: string): string {
-    const parsedUrl = url.parse(urlString, true);
-    parsedUrl.query.message = message;
-    parsedUrl.query.messageId = messageId;
-    // Re-render the query params.
-    delete parsedUrl.search;
-
-    return url.format(parsedUrl);
   }
 }
