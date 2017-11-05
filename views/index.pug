@@ -22,11 +22,13 @@ html
           tr
             th Token
             th Web Hook URL
+            th Method
             th 
           each bot in bots
             tr
               td= bot.token
-              td= bot.webhookUrl
+              td= bot.webhookUri
+              td= bot.method
               td
                 a(href=`/bot/remove?tokenId=${bot.tokenId}`) Remove
       form(action='/bot/add' method='POST')
@@ -42,9 +44,9 @@ html
               input(id='botTokenInput' type='text', name='botToken')
           tr
             td
-              label(for='webhookUrlInput') Web Hook URI:
+              label(for='webhookUriInput') Web Hook URI:
             td
-              input(id='webhookUrlInput' type='text', name='webhookUrl')
+              input(id='webhookUriInput' type='text', name='webhookUri')
           tr
             td Method:
             td
