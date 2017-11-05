@@ -1,13 +1,16 @@
 import * as express from 'express';
+import * as _ from 'lodash';
 import * as autobind from 'protobind';
 import * as querystring from 'querystring';
 
+import { DiscordClientActions, IToken } from '../actions';
 import createLogger from '../lib/logger';
 
 const LOG = createLogger('PageHandler');
 
 export class PageHandler {
   constructor(
+    private readonly discordClientActions: DiscordClientActions,
     private readonly clientId?: string,
     private readonly oauthRedirectUri?: string,
   ) {
@@ -28,7 +31,21 @@ export class PageHandler {
       // state: '123456', // TODO: Change this to something uique to the user.
     };
 
+    let bots: IToken[] = [];
+    if (req.user) {
+      bots = _.map(
+        await this.discordClientActions.getUserTokens(req.user.userId),
+        bot => {
+          return {
+            ...bot,
+            token: _.truncate(bot.token, { length: 10 }),
+          };
+        },
+      );
+    }
+
     res.render('index', {
+      bots,
       oauthParams: querystring.stringify(oauthParams),
       user: req.user,
      });
