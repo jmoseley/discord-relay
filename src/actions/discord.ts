@@ -24,15 +24,17 @@ export class DiscordClientActions {
   public async startPersistedClients(): Promise<void> {
     const clients = await this.discordTokenDao.getAllTokenHooks();
 
-    const activeClients = _.compact(await Promise.all(_.map(
+    const startedClients = _.compact(await Promise.all(_.map(
       clients,
       (client: IToken) => this.startClient(client.token, client.webhookUrl, client.tokenId),
     )));
 
-    this.activeClients = _(activeClients)
-      .map((client: DiscordMessageHandler) => [client.tokenId, client])
-      .fromPairs()
-      .value();
+    this.activeClients = _.fromPairs(
+      _.map(
+        startedClients,
+        (client: DiscordMessageHandler) => [client.tokenId, client],
+      ),
+    );
   }
 
   public async getUserTokens(userId: string) {
@@ -65,6 +67,8 @@ export class DiscordClientActions {
     }
 
     await this.discordTokenDao.deleteToken(tokenId);
+    await this.activeClients[tokenId].stop();
+    delete this.activeClients[tokenId];
   }
 
   // TODO: Move this into a worker.

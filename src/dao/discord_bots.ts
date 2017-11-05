@@ -77,11 +77,14 @@ export class DiscordBotsDAO {
     return _.map(result.Items, this.mapTokenItemToToken);
   }
 
-  public async addToken(token: string, webhookUrl: string, userId: string): Promise<void> {
+  /**
+   * Returns null if the token already exists.
+   */
+  public async addToken(token: string, webhookUrl: string, userId: string): Promise<IToken | null> {
     // Check for an existing one.
     const existingToken = await this.findToken(token);
     if (existingToken) {
-      return;
+      return null;
     }
 
     const tokenId = uuid.v4();
@@ -104,6 +107,13 @@ export class DiscordBotsDAO {
       },
       TableName: TABLE_NAME,
     }, undefined).promise();
+
+    return {
+      token,
+      tokenId,
+      userId,
+      webhookUrl,
+    };
   }
 
   private async findToken(token: string): Promise<IToken | null> {
