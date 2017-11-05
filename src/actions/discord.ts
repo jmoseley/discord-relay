@@ -6,6 +6,8 @@ import createLogger from '../lib/logger';
 
 const LOG = createLogger('DiscordClientActions');
 
+export { IBot } from '../dao';
+
 export class DiscordClientActions {
   private activeClients: DiscordMessageHandler[];
 
@@ -19,6 +21,12 @@ export class DiscordClientActions {
 
     this.activeClients = _.compact(await Promise.all(
       clients.map(client => this.startClient(client.token, client.webhookUrl))));
+  }
+
+  public async getUserBots(userId: string) {
+    return this.discordBotDao.findBots({
+      userId,
+    });
   }
 
   public async addClient(token: string, webhookUrl: string, userId: string): Promise<void> {

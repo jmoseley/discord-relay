@@ -17,6 +17,18 @@ html
       p
         a(href='/logout') Logout
       h3 Manage Bots
+      if bots.length > 0
+        table
+          tr
+            th Token
+            th Web Hook URL
+            th 
+          each bot in bots
+            tr
+              td= bot.token
+              td= bot.webhookUrl
+              td
+                a(href=`/bot/remove?botId=${bot.id}`) Remove
       form(action='/bot/add' method='POST')
         p
           label(for='botTokenInput') Bot Token: 
