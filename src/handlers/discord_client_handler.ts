@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import * as _ from 'lodash';
 import * as autobind from 'protobind';
 
 import {
@@ -39,12 +40,34 @@ export class DiscordClientConfigurationHandler {
       res.status(401).send('Must login before adding bots.');
       return;
     }
-    if (!req.body.botToken || !req.body.webhookUrl) {
+    if (
+      !req.body.botToken ||
+      !req.body.webhookUri ||
+      !req.body.method ||
+      (req.body.method !== 'POST' &&
+      req.body.method !== 'GET')
+    ) {
       // TODO: Generic error handling. We should be able to just throw an error.
-      res.status(400).send('"botToken" and "webhookUrl" are required.');
+      res.status(400).send('"botToken", "webhookUri", and "method" are required.');
       return;
     }
-    await this.discordActions.addClient(req.body.botToken, req.body.webhookUrl, req.user.userId);
+    const headers = _.compact(_.map([1, 2, 3, 4, 5], num => {
+      const name = req.body[`headerName${num}`];
+      const value = req.body[`headerValue${num}`];
+
+      if (!name || !value) {
+        return null;
+      }
+
+      return [name, value];
+    })) as Array<[string, string]>;
+    await this.discordActions.addClient(
+      req.body.botToken,
+      req.user.userId,
+      req.body.webhookUri,
+      req.body.method,
+      headers,
+    );
     res.redirect(302, '/');
   }
 
