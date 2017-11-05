@@ -22,17 +22,17 @@ export class DiscordClientActions {
 
   // TODO: Move this into a worker.
   public async startPersistedClients(): Promise<void> {
-    const clients = await this.discordTokenDao.getAllTokenHooks();
+    const tokens = await this.discordTokenDao.getAllTokenHooks();
 
     const startedClients = _.compact(await Promise.all(_.map(
-      clients,
-      (client: IToken) => this.startClient(client.token, client.webhookUrl, client.tokenId),
+      tokens,
+      (token: IToken) => this.startClient(token),
     )));
 
     this.activeClients = _.fromPairs(
       _.map(
         startedClients,
-        (client: DiscordMessageHandler) => [client.tokenId, client],
+        (client: DiscordMessageHandler) => [client.token.tokenId, client],
       ),
     );
   }
@@ -43,14 +43,20 @@ export class DiscordClientActions {
     });
   }
 
-  public async addClient(tokenString: string, webhookUrl: string, userId: string): Promise<void> {
-    const token = await this.discordTokenDao.addToken(tokenString, webhookUrl, userId);
+  public async addClient(
+    tokenString: string,
+    userId: string,
+    webhookUri: string,
+    method: string,
+    headers: Array<[string, string]>,
+  ): Promise<void> {
+    const token = await this.discordTokenDao.addToken(tokenString, userId, webhookUri, method, headers);
     // If no token, it already exists, which means it is already running.
     if (!token) {
       return;
     }
 
-    const client = await this.startClient(tokenString, webhookUrl, token.tokenId);
+    const client = await this.startClient(token);
     if (client) {
       this.activeClients[token.tokenId] = client;
     }
@@ -72,15 +78,10 @@ export class DiscordClientActions {
   }
 
   // TODO: Move this into a worker.
-  private async startClient(token: string, webhookUrl: string, tokenId: string): Promise<DiscordMessageHandler | null> {
-    LOG.info(`Starting client for token ${_.truncate(token, { length: 10 })}`);
-    if (!webhookUrl) {
-      LOG.info(`Not starting client for token ` +
-        `${_.truncate(token, { length: 10 })} because there is no matching webhook.`);
-      return null;
-    }
+  private async startClient(token: IToken): Promise<DiscordMessageHandler | null> {
+    LOG.info(`Starting client for token ${_.truncate(token.token, { length: 10 })}`);
 
-    const messageHandler = new DiscordMessageHandler(token, webhookUrl, tokenId);
+    const messageHandler = new DiscordMessageHandler(token);
     await messageHandler.start();
 
     return messageHandler;

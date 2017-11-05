@@ -14,9 +14,13 @@ export interface ITokenSearchParams {
 }
 
 export interface IToken {
+  headers: {
+    [key: string]: string,
+  };
+  method: string;
   token: string;
   tokenId: string;
-  webhookUrl: string;
+  webhookUri: string;
   userId: string;
 }
 
@@ -80,7 +84,13 @@ export class DiscordBotsDAO {
   /**
    * Returns null if the token already exists.
    */
-  public async addToken(token: string, webhookUrl: string, userId: string): Promise<IToken | null> {
+  public async addToken(
+    token: string,
+    userId: string,
+    webhookUri: string,
+    method: string,
+    headers: Array<[string, string]>,
+  ): Promise<IToken | null> {
     // Check for an existing one.
     const existingToken = await this.findToken(token);
     if (existingToken) {
@@ -89,30 +99,42 @@ export class DiscordBotsDAO {
 
     const tokenId = uuid.v4();
     // TODO: Encrypt the token.
-    LOG.info(`Saving token ${_.truncate(token, { length: 10 })} with webhook ${webhookUrl}`);
+    LOG.info(`Saving token ${_.truncate(token, { length: 10 })} with webhook ${webhookUri}`);
     await this.dynamoDB.putItem({
       Item: {
-       tokenId: {
-         S: tokenId,
-       },
-       tokenString: {
-         S: token,
-       },
-       userId: {
-         S: userId,
-       },
-       webhookUrl: {
-         S: webhookUrl,
-       },
+        headers: {
+          L: _.map(headers, header => ({ L: _.map(header, headerVal => ({S: headerVal })) })),
+        },
+        method: {
+          S: method,
+        },
+        tokenId: {
+          S: tokenId,
+        },
+        tokenString: {
+          S: token,
+        },
+        userId: {
+          S: userId,
+        },
+        webhookUri: {
+          S: webhookUri,
+        },
       },
       TableName: TABLE_NAME,
     }, undefined).promise();
 
+    const parsedHeaders = _.merge({},
+      ..._.map(headers, header => ({ [header[0]]: header[1] })),
+    );
+
     return {
+      headers: parsedHeaders,
+      method,
       token,
       tokenId,
       userId,
-      webhookUrl,
+      webhookUri,
     };
   }
 
@@ -135,11 +157,16 @@ export class DiscordBotsDAO {
   }
 
   private mapTokenItemToToken(item: { [key: string]: AWS.DynamoDB.AttributeValue }): IToken {
+    const headers = _.merge({},
+      ..._.map(item.headers.L, (header: any) => ({ [header.L[0].S as string]: header.L[1].S as string })),
+    );
     return {
+      headers,
+      method: item.method.S as string,
       token: item.tokenString.S as string,
       tokenId: item.tokenId.S as string,
       userId: item.userId.S as string,
-      webhookUrl: item.webhookUrl.S as string,
+      webhookUri: item.webhookUri.S as string,
     };
   }
 

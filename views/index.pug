@@ -22,11 +22,13 @@ html
           tr
             th Token
             th Web Hook URL
+            th Method
             th 
           each bot in bots
             tr
               td= bot.token
-              td= bot.webhookUrl
+              td= bot.webhookUri
+              td= bot.method
               td
                 a(href=`/bot/remove?tokenId=${bot.tokenId}`) Remove
       form(action='/bot/add' method='POST')
@@ -34,16 +36,44 @@ html
           | Check out the 
           a(href='/instructions.html') instructions 
           | for information on setting up your Discord bot.
+        table
+          tr
+            td
+              label(for='botTokenInput') Bot Token:
+            td
+              input(id='botTokenInput' type='text', name='botToken')
+          tr
+            td
+              label(for='webhookUriInput') Web Hook URI:
+            td
+              input(id='webhookUriInput' type='text', name='webhookUri')
+          tr
+            td Method:
+            td
+              label(for='methodGet')  GET
+              input(id='methodGet' checked type='radio' name='method' value='GET')
+              label(for='methodPost') POST
+              input(id='methodPost' type='radio' name='method' value='POST')
         p
-          label(for='botTokenInput') Bot Token: 
-          input(id='botTokenInput' type='text', name='botToken')
-        p
-          label(for='webhookUrlInput') Web Hook URL: 
-          input(id='webhookUrlInput' type='text', name='webhookUrl')
+          | Headers:
+          table
+            tr
+             th Name
+             th Value
+            each headerNum in [1, 2, 3, 4, 5]
+              tr
+                td
+                  input(type='text', name=`headerName${headerNum}`)
+                td
+                  input(type='text', name=`headerValue${headerNum}`)
+
         input(type='submit', value='Add Bot')
     else
       h2 Login With Discord
       a(href=`https://discordapp.com/api/oauth2/authorize?${oauthParams}`)
         img.discord_logo(src='https://discordapp.com/assets/94db9c3c1eba8a38a1fcf4f223294185.png')
+    hr
+    small
+      a(href='https://github.com/jmoseley/discord-relay') Source is on Github
 
 
