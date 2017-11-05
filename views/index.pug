@@ -31,6 +31,10 @@ html
                 a(href=`/bot/remove?tokenId=${bot.tokenId}`) Remove
       form(action='/bot/add' method='POST')
         p
+          | Check out the 
+          a(href='/instructions.html') instructions 
+          | for information on setting up your Discord bot.
+        p
           label(for='botTokenInput') Bot Token: 
           input(id='botTokenInput' type='text', name='botToken')
         p
