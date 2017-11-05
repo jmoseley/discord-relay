@@ -47,7 +47,7 @@ async function start(): Promise<void> {
 
   const statusHandler = new handlers.StatusHandler();
   const discordClientHandler = new handlers.DiscordClientConfigurationHandler(discordClientActions);
-  const pageHandler = new handlers.PageHandler(DISCORD_CLIENT_ID, DISCORD_OAUTH_REDIRECT_URI);
+  const pageHandler = new handlers.PageHandler(discordClientActions, DISCORD_CLIENT_ID, DISCORD_OAUTH_REDIRECT_URI);
   const oauthHandler = new handlers.OAuthHandler(
     authProvider,
     DISCORD_CLIENT_ID,
@@ -75,6 +75,8 @@ async function start(): Promise<void> {
   router.get('/status', statusHandler.status);
   router.get('/bot/auth', discordClientHandler.addBotToChannel);
   router.post('/bot/add', discordClientHandler.addClient);
+  // This should be a POST or DELETE, but a GET can be trigger by a hyperlink.
+  router.get('/bot/remove', discordClientHandler.removeClient);
   router.get('/oauth', oauthHandler.code);
   router.get('/', pageHandler.index);
   router.get('/logout', pageHandler.logout);
