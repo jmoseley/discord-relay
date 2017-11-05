@@ -34,24 +34,16 @@ export default class DiscordMessageHandler {
       this.log.info(`Discord Client is ready.`);
     });
 
-    this.discordClient.on('message', (message: string) => {
-      // Message isn't actually a string yet.
-      message = message.toString();
-      const messageId = uuid.v4();
-
-      this.log.info(`${messageId}: Triggering webhook for message '${message}' to '${this.token.webhookUri}'`);
+    this.discordClient.on('message', (message: Discord.Message) => {
+      this.log.info(`Triggering webhook for message '${message.content}' to '${this.token.webhookUri}'`);
 
       let body: any;
       let qs: any;
       if (this.token.method === 'POST') {
-        body = {};
-        body.message = message;
-        body.messageId = messageId;
+        body = this.getMessageData(message);
       }
       if (this.token.method === 'GET') {
-        qs = {};
-        qs.message = message;
-        qs.messageId = messageId;
+        qs = this.getMessageData(message);
       }
 
       request(this.token.webhookUri, {
@@ -61,5 +53,13 @@ export default class DiscordMessageHandler {
         qs,
       });
     });
+  }
+
+  private getMessageData(message: Discord.Message): any {
+    return {
+      author: message.author.username,
+      createdTimestamp: message.createdTimestamp,
+      message: message.content,
+    };
   }
 }
