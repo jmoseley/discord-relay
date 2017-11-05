@@ -1,19 +1,21 @@
 import * as AWS from 'aws-sdk';
 import * as _ from 'lodash';
 import * as autobind from 'protobind';
+import * as uuid from 'uuid';
 
 import createLogger from '../lib/logger';
 
 const LOG = createLogger('DiscordBotsDAO');
 
-const TABLE_NAME = 'DiscordRelay.Bots';
+const TABLE_NAME = 'DiscordRelay.BotTokens';
 
-export interface IBotSearchParams {
+export interface ITokenSearchParams {
   userId: string;
 }
 
-export interface IBot {
+export interface IToken {
   token: string;
+  tokenId: string;
   webhookUrl: string;
   userId: string;
 }
@@ -24,19 +26,16 @@ export class DiscordBotsDAO {
     autobind(this);
   }
 
-  public async getAllBotHooks(): Promise<Array<{ token: string, webhookUrl: string }>> {
+  public async getAllTokenHooks(): Promise<IToken[]> {
     // TODO: Typing.
     const tokensResult = await this.dynamoDB.scan({
       TableName: TABLE_NAME,
     }).promise();
 
-    return _.map(tokensResult.Items, (item: any) => ({
-      token: _.get(item.token, 'S'),
-      webhookUrl: _.get(item.webhookUrl, 'S'),
-    }));
+    return _.map(tokensResult.Items, this.mapTokenItemToToken);
   }
 
-  public async findBots(searchParams: IBotSearchParams): Promise<IBot[]> {
+  public async findTokens(searchParams: ITokenSearchParams): Promise<IToken[]> {
     const result =  await this.dynamoDB.scan({
       ExpressionAttributeValues: {
         ':uid': {
@@ -47,13 +46,7 @@ export class DiscordBotsDAO {
       TableName: TABLE_NAME,
     }).promise();
 
-    return _.map(result.Items, item => {
-      return {
-        token: item.token.S as string,
-        userId: item.userId.S as string,
-        webhookUrl: item.webhookUrl.S as string,
-      };
-    });
+    return _.map(result.Items, this.mapTokenItemToToken);
   }
 
   public async addToken(token: string, webhookUrl: string, userId: string): Promise<void> {
@@ -74,4 +67,32 @@ export class DiscordBotsDAO {
       TableName: TABLE_NAME,
     }, undefined).promise();
   }
+
+  private async findToken(token: string): Promise<IToken | null> {
+    const result = await this.dynamoDB.scan({
+      ExpressionAttributeValues: {
+        ':tok': {
+          S: token,
+        },
+      },
+      FilterExpression: 'token = :tok',
+      TableName: TABLE_NAME,
+    }, undefined).promise();
+
+    if (!_.get(result.Items, 'length')) {
+      return null;
+    }
+
+    return this.mapTokenItemToToken(_.get(result.Items, '0'));
+  }
+
+  private mapTokenItemToToken(item: { [key: string]: AWS.DynamoDB.AttributeValue }): IToken {
+    return {
+      token: item.token.S as string,
+      tokenId: item.tokenId.S as string,
+      userId: item.userId.S as string,
+      webhookUrl: item.webhookUrl.S as string,
+    };
+  }
+
 }

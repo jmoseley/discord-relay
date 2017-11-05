@@ -6,7 +6,7 @@ import createLogger from '../lib/logger';
 
 const LOG = createLogger('DiscordClientActions');
 
-export { IBot } from '../dao';
+export { IToken } from '../dao';
 
 export class DiscordClientActions {
   private activeClients: DiscordMessageHandler[];
@@ -17,14 +17,14 @@ export class DiscordClientActions {
 
   // TODO: Move this into a worker.
   public async startPersistedClients(): Promise<void> {
-    const clients = await this.discordBotDao.getAllBotHooks();
+    const clients = await this.discordBotDao.getAllTokenHooks();
 
     this.activeClients = _.compact(await Promise.all(
       clients.map(client => this.startClient(client.token, client.webhookUrl))));
   }
 
   public async getUserBots(userId: string) {
-    return this.discordBotDao.findBots({
+    return this.discordBotDao.findTokens({
       userId,
     });
   }
