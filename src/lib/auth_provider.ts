@@ -51,8 +51,15 @@ export default class AuthProvider {
     return null;
   }
 
-  public async createDiscordUser(authDetails: IOAuthTokens, userDetails: IDiscordUserDetails): Promise<IDiscordUser> {
-    const newUserId = uuid.v4();
+  public async addUser(authDetails: IOAuthTokens, userDetails: IDiscordUserDetails): Promise<IDiscordUser> {
+    // Try to find an existing user first.
+    const existingUser = await this.getUserWithDiscordId(userDetails.id);
+
+    let userId = uuid.v4();
+    if (existingUser) {
+      // Ensure the user gets updated.
+      userId = existingUser.userId;
+    }
 
     await this.dynamoDb.putItem({
       Item: {
@@ -72,7 +79,7 @@ export default class AuthProvider {
           S: authDetails.refreshToken,
         },
         userId: {
-          S: newUserId,
+          S: userId,
         },
         username: {
           S: userDetails.username,
@@ -83,8 +90,33 @@ export default class AuthProvider {
 
     return {
       email: userDetails.email,
-      userId: newUserId,
+      userId,
       username: userDetails.username,
+    };
+  }
+
+  private async getUserWithDiscordId(discordUserId: string): Promise<IDiscordUser | null> {
+    LOG.info(`Looing up user with discordUserId ${discordUserId}`);
+    const result = await this.dynamoDb.scan({
+      ExpressionAttributeValues: {
+        ':duid': {
+          S: discordUserId,
+        },
+      },
+      FilterExpression: 'discordUserId = :duid',
+      Select: 'ALL_ATTRIBUTES',
+      TableName: TABLE_NAME,
+    }, undefined).promise();
+
+    if (!result.Items || !result.Items.length) {
+      return null;
+    }
+
+    return {
+      // This typecasting is bullshit.
+      email: result.Items[0].email.S as string,
+      userId: result.Items[0].userId.S as string,
+      username: result.Items[0].username.S as string,
     };
   }
 

@@ -25,7 +25,6 @@ export class OAuthHandler {
   }
 
   public async code(req: Request, res: Response): Promise<void> {
-    LOG.info(`Fetching oauth token.`);
     const code = req.query.code;
 
     const authTokens = await request.post(DISCORD_TOKEN_URL, {
@@ -39,7 +38,6 @@ export class OAuthHandler {
       json: true,
     });
 
-    LOG.info(`Got auth tokens, getting user data.`);
     // Get user data.
     const userDetails = await request.get(DISCORD_USER_URL, {
       headers: {
@@ -47,9 +45,8 @@ export class OAuthHandler {
       },
       json: true,
     });
-    LOG.info(`Got user data.`);
 
-    const user = await this.authProvider.createDiscordUser({
+    const user = await this.authProvider.addUser({
       accessToken: authTokens.access_token,
       expiresAt: moment().add(authTokens.expires_in, 'seconds').toDate(),
       refreshToken: authTokens.refresh_token,
