@@ -1,0 +1,23 @@
+<html>
+  <head>
+    <title>Discord Relay Bot Instructions</title>
+  </head>
+  <body>
+    <h1>Discord Relay</h1>
+    <h2>Instructions for setting up your bot.</h2>
+    <h3>Step 1: Setup a Discord Application</h3>
+    <p>
+      Go to the <a href="https://discordapp.com/developers/applications/me">Discord Developers</a> page, and click "New App". Give your app a name. You don't need to worry about any Redirect URLs for bot users.
+    </p>
+    <h3>Step 2: Create a Bot User</h3>
+    Click the "Create a Bot User" button.
+    <h3>Step 3: Add the bot to some channels</h3>
+    Get the Client ID for your app (underneath App Details). Visit 'http://discord-relay.jeremymoseley.net/bot/auth?clientId=:your clientId:'. This will forward you to the URL to add your bot to the page. This action does not give DiscordRelay any permissions to post or access your channels, it's just to help you get your bot added to your channels.
+    <h3>Step 4: Login</h3>
+    Login to DiscordRelay using Discord on the main page.
+    <h3>Step 5: Set up your webhook</h3>
+    Get your bot token from your Discord Application page (underneath App Bot User). Paste this token in the form and add your web hook url. This must be a well formed URL including the protocol (ie 'http://').
+    <h3>Step 6: Your ready to go!</h3>
+    You should be receiving calls to the webhook with messages.
+  </body>
+</html>
