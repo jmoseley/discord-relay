@@ -10,7 +10,11 @@ export default class DiscordMessageHandler {
   private discordClient: Discord.Client;
   private log: Logger;
 
-  constructor(private readonly token: string, private readonly webhookUrl: string) {
+  constructor(
+    private readonly token: string,
+    private readonly webhookUrl: string,
+    public readonly tokenId: string,
+  ) {
     this.log = createLogger(`DiscordMessageHandler(${token})`);
     this.discordClient = new Discord.Client();
 
