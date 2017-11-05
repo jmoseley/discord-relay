@@ -34,12 +34,37 @@ html
           | Check out the 
           a(href='/instructions.html') instructions 
           | for information on setting up your Discord bot.
+        table
+          tr
+            td
+              label(for='botTokenInput') Bot Token:
+            td
+              input(id='botTokenInput' type='text', name='botToken')
+          tr
+            td
+              label(for='webhookUrlInput') Web Hook URI:
+            td
+              input(id='webhookUrlInput' type='text', name='webhookUrl')
+          tr
+            td Method:
+            td
+              label(for='methodGet')  GET
+              input(id='methodGet' checked type='radio' name='method' value='GET')
+              label(for='methodPost') POST
+              input(id='methodPost' type='radio' name='method' value='POST')
         p
-          label(for='botTokenInput') Bot Token: 
-          input(id='botTokenInput' type='text', name='botToken')
-        p
-          label(for='webhookUrlInput') Web Hook URL: 
-          input(id='webhookUrlInput' type='text', name='webhookUrl')
+          | Headers:
+          table
+            tr
+             th Name
+             th Value
+            each headerNum in [1, 2, 3, 4, 5]
+              tr
+                td
+                  input(type='text', name=`headerName${headerNum}`)
+                td
+                  input(type='text', name=`headerValue${headerNum}`)
+
         input(type='submit', value='Add Bot')
     else
       h2 Login With Discord
