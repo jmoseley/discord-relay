@@ -75,6 +75,8 @@ async function start(): Promise<void> {
   router.get('/status', statusHandler.status);
   router.get('/bot/auth', discordClientHandler.addBotToChannel);
   router.post('/bot/add', discordClientHandler.addClient);
+  // This should be a POST or DELETE, but a GET can be trigger by a hyperlink.
+  router.get('/bot/remove', discordClientHandler.removeClient);
   router.get('/oauth', oauthHandler.code);
   router.get('/', pageHandler.index);
   router.get('/logout', pageHandler.logout);
