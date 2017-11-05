@@ -30,13 +30,17 @@ export class DiscordClientConfigurationHandler {
   /**
    * Starts the discord client using the given token.
    */
-  public async addClient(req: Request, res: Response): Promise<void> {
+  public async addClient(req: any, res: Response): Promise<void> {
+    if (!req.user) {
+      res.status(401).send('Must login before adding bots.');
+      return;
+    }
     if (!req.body.botToken || !req.body.webhookUrl) {
-      // TODO: Generic error handling.
+      // TODO: Generic error handling. We should be able to just throw an error.
       res.status(400).send('"botToken" and "webhookUrl" are required.');
       return;
     }
-    await this.discordActions.addClient(req.body.botToken, req.body.webhookUrl);
-    res.send('success');
+    await this.discordActions.addClient(req.body.botToken, req.body.webhookUrl, req.user.userId);
+    res.redirect(302, '/');
   }
 }
