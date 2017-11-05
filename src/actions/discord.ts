@@ -11,26 +11,26 @@ export { IToken } from '../dao';
 export class DiscordClientActions {
   private activeClients: DiscordMessageHandler[];
 
-  constructor(private readonly discordBotDao: DiscordBotsDAO) {
+  constructor(private readonly discordTokenDao: DiscordBotsDAO) {
     this.activeClients = [];
   }
 
   // TODO: Move this into a worker.
   public async startPersistedClients(): Promise<void> {
-    const clients = await this.discordBotDao.getAllTokenHooks();
+    const clients = await this.discordTokenDao.getAllTokenHooks();
 
     this.activeClients = _.compact(await Promise.all(
       clients.map(client => this.startClient(client.token, client.webhookUrl))));
   }
 
-  public async getUserBots(userId: string) {
-    return this.discordBotDao.findTokens({
+  public async getUserTokens(userId: string) {
+    return this.discordTokenDao.findTokens({
       userId,
     });
   }
 
   public async addClient(token: string, webhookUrl: string, userId: string): Promise<void> {
-    await this.discordBotDao.addToken(token, webhookUrl, userId);
+    await this.discordTokenDao.addToken(token, webhookUrl, userId);
     const client = await this.startClient(token, webhookUrl);
     if (client) {
       this.activeClients.push(client);

@@ -34,7 +34,7 @@ export class PageHandler {
     let bots: IToken[] = [];
     if (req.user) {
       bots = _.map(
-        await this.discordClientActions.getUserBots(req.user.userId),
+        await this.discordClientActions.getUserTokens(req.user.userId),
         bot => {
           return {
             ...bot,
