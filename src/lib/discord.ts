@@ -25,6 +25,11 @@ export default class DiscordMessageHandler {
     await this.discordClient.login(this.token);
   }
 
+  public async stop() {
+    this.log.info(`Destroying client`);
+    await this.discordClient.destroy();
+  }
+
   private configureClient(): void {
     this.discordClient.on('ready', () => {
       this.log.info(`Discord Client is ready.`);
