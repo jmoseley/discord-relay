@@ -33,4 +33,8 @@ export class PageHandler {
       user: req.user,
      });
   }
+
+  public async logout(req: express.Request, res: express.Response): Promise<void> {
+    res.clearCookie('userId').redirect(302, '/');
+  }
 }

@@ -89,6 +89,10 @@ export default class AuthProvider {
   }
 
   private async getUser(userId: string): Promise<IDiscordUser | null> {
+    if (!userId) {
+      return null;
+    }
+
     const result = await this.dynamoDb.query({
       ExpressionAttributeValues: {
         ':uid': {

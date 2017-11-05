@@ -14,6 +14,7 @@ html
       | , allowing for event driven bot integration.
     if user
       h2 Welcome #{user.username}
+      a(href='/logout') Logout
     else
       h2 Login With Discord
       a(href=`https://discordapp.com/api/oauth2/authorize?${oauthParams}`)
