@@ -47,7 +47,7 @@ async function start(): Promise<void> {
 
   const statusHandler = new handlers.StatusHandler();
   const discordClientHandler = new handlers.DiscordClientConfigurationHandler(discordClientActions);
-  const pageHandler = new handlers.PageHandler(DISCORD_CLIENT_ID, DISCORD_OAUTH_REDIRECT_URI);
+  const pageHandler = new handlers.PageHandler(discordClientActions, DISCORD_CLIENT_ID, DISCORD_OAUTH_REDIRECT_URI);
   const oauthHandler = new handlers.OAuthHandler(
     authProvider,
     DISCORD_CLIENT_ID,
