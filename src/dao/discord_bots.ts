@@ -50,12 +50,22 @@ export class DiscordBotsDAO {
   }
 
   public async addToken(token: string, webhookUrl: string, userId: string): Promise<void> {
+    // Check for an existing one.
+    const existingToken = await this.findToken(token);
+    if (existingToken) {
+      return;
+    }
+
+    const tokenId = uuid.v4();
     // TODO: Encrypt the token.
     LOG.info(`Saving token ${_.truncate(token, { length: 10 })} with webhook ${webhookUrl}`);
     await this.dynamoDB.putItem({
       Item: {
        token: {
          S: token,
+       },
+       tokenId: {
+         S: tokenId,
        },
        userId: {
          S: userId,
