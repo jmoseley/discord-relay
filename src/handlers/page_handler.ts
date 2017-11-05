@@ -2,6 +2,10 @@ import * as express from 'express';
 import * as autobind from 'protobind';
 import * as querystring from 'querystring';
 
+import createLogger from '../lib/logger';
+
+const LOG = createLogger('PageHandler');
+
 export class PageHandler {
   constructor(
     private readonly clientId?: string,
@@ -13,7 +17,8 @@ export class PageHandler {
     }
   }
 
-  public async index(req: express.Request, res: express.Response): Promise<void> {
+  // req is an express.Request
+  public async index(req: any, res: express.Response): Promise<void> {
     // Aligns with Authorization Url from https://discordapp.com/developers/docs/topics/oauth2#authorization-code-grant.
     const oauthParams = {
       client_id: this.clientId,
@@ -25,6 +30,7 @@ export class PageHandler {
 
     res.render('index', {
       oauthParams: querystring.stringify(oauthParams),
+      user: req.user,
      });
   }
 }
