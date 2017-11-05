@@ -8,6 +8,9 @@ const LOG = createLogger('DiscordClientActions');
 
 export { IToken } from '../dao';
 
+export const TOKEN_DOES_NOT_EXIST_ERROR = 'TOKEN_DOES_NOT_EXIST';
+export const TOKEN_DOES_NOT_BELONG_TO_USER_ERROR = 'TOKEN_DOES_NOT_BELONG_TO_USER';
+
 export class DiscordClientActions {
   private activeClients: DiscordMessageHandler[];
 
@@ -35,6 +38,19 @@ export class DiscordClientActions {
     if (client) {
       this.activeClients.push(client);
     }
+  }
+
+  public async deleteToken(tokenId: string, userId: string): Promise<void> {
+    const existingToken = await this.discordTokenDao.getToken(tokenId);
+    if (!existingToken) {
+      throw new Error(TOKEN_DOES_NOT_EXIST_ERROR);
+    }
+
+    if (existingToken.userId !== userId) {
+      throw new Error(TOKEN_DOES_NOT_BELONG_TO_USER_ERROR);
+    }
+
+    await this.discordTokenDao.deleteToken(tokenId);
   }
 
   // TODO: Move this into a worker.

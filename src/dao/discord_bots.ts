@@ -35,6 +35,34 @@ export class DiscordBotsDAO {
     return _.map(tokensResult.Items, this.mapTokenItemToToken);
   }
 
+  public async getToken(tokenId: string): Promise<IToken | null> {
+    const result = await this.dynamoDB.getItem({
+      Key: {
+        tokenId: {
+          S: tokenId,
+        },
+      },
+      TableName: TABLE_NAME,
+    }, undefined).promise();
+
+    if (!result.Item) {
+      return null;
+    }
+
+    return this.mapTokenItemToToken(result.Item);
+  }
+
+  public async deleteToken(tokenId: string): Promise<void> {
+    await this.dynamoDB.deleteItem({
+      Key: {
+        tokenId: {
+          S: tokenId,
+        },
+      },
+      TableName: TABLE_NAME,
+    }, undefined).promise();
+  }
+
   public async findTokens(searchParams: ITokenSearchParams): Promise<IToken[]> {
     const result =  await this.dynamoDB.scan({
       ExpressionAttributeValues: {
@@ -61,11 +89,11 @@ export class DiscordBotsDAO {
     LOG.info(`Saving token ${_.truncate(token, { length: 10 })} with webhook ${webhookUrl}`);
     await this.dynamoDB.putItem({
       Item: {
-       token: {
-         S: token,
-       },
        tokenId: {
          S: tokenId,
+       },
+       tokenString: {
+         S: token,
        },
        userId: {
          S: userId,
@@ -85,7 +113,7 @@ export class DiscordBotsDAO {
           S: token,
         },
       },
-      FilterExpression: 'token = :tok',
+      FilterExpression: 'tokenString = :tok',
       TableName: TABLE_NAME,
     }, undefined).promise();
 
@@ -98,7 +126,7 @@ export class DiscordBotsDAO {
 
   private mapTokenItemToToken(item: { [key: string]: AWS.DynamoDB.AttributeValue }): IToken {
     return {
-      token: item.token.S as string,
+      token: item.tokenString.S as string,
       tokenId: item.tokenId.S as string,
       userId: item.userId.S as string,
       webhookUrl: item.webhookUrl.S as string,

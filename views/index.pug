@@ -28,7 +28,7 @@ html
               td= bot.token
               td= bot.webhookUrl
               td
-                a(href=`/bot/remove?botId=${bot.id}`) Remove
+                a(href=`/bot/remove?tokenId=${bot.tokenId}`) Remove
       form(action='/bot/add' method='POST')
         p
           label(for='botTokenInput') Bot Token: 
