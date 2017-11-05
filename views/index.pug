@@ -14,7 +14,17 @@ html
       | , allowing for event driven bot integration.
     if user
       h2 Welcome #{user.username}
-      a(href='/logout') Logout
+      p
+        a(href='/logout') Logout
+      h3 Manage Bots
+      form(action='/bot/add' method='POST')
+        p
+          label(for='botTokenInput') Bot Token: 
+          input(id='botTokenInput' type='text', name='botToken')
+        p
+          label(for='webhookUrlInput') Web Hook URL: 
+          input(id='webhookUrlInput' type='text', name='webhookUrl')
+        input(type='submit', value='Add Bot')
     else
       h2 Login With Discord
       a(href=`https://discordapp.com/api/oauth2/authorize?${oauthParams}`)
