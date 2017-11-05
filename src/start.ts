@@ -77,6 +77,7 @@ async function start(): Promise<void> {
   router.post('/bot/add', discordClientHandler.addClient);
   router.get('/oauth', oauthHandler.code);
   router.get('/', pageHandler.index);
+  router.get('/logout', pageHandler.logout);
 
   app.use(router);
 
