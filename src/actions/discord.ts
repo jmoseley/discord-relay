@@ -1,12 +1,12 @@
 import * as _ from 'lodash';
 
-import { DiscordBotsDAO, DiscordMessageDAO, IToken } from '../dao';
+import { DiscordBotsDAO, DiscordMessageDAO, IMessage, IToken } from '../dao';
 import DiscordMessageHandler from '../lib/discord';
 import createLogger from '../lib/logger';
 
 const LOG = createLogger('DiscordClientActions');
 
-export { IToken } from '../dao';
+export { IMessage, IToken } from '../dao';
 
 export const TOKEN_DOES_NOT_EXIST_ERROR = 'TOKEN_DOES_NOT_EXIST';
 export const TOKEN_DOES_NOT_BELONG_TO_USER_ERROR = 'TOKEN_DOES_NOT_BELONG_TO_USER';
@@ -40,10 +40,19 @@ export class DiscordClientActions {
     );
   }
 
-  public async getUserTokens(userId: string) {
-    return this.discordTokenDao.findTokens({
+  public async getUserTokens(userId: string): Promise<Array<{
+    token: IToken,
+    messages: IMessage[],
+  }>> {
+    const tokens = await this.discordTokenDao.findTokens({
       userId,
     });
+
+    return await Promise.all(_.map(tokens, async (token: IToken) => {
+      const messages = await this.discordMessageDao.getMessagesForToken(token.tokenId);
+
+      return { token, messages };
+    }));
   }
 
   public async addClient(
