@@ -26,9 +26,6 @@ export class DiscordMessageDAO {
         channelId: {
           S: message.channel.id,
         },
-        content: {
-          S: message.content,
-        },
         messageId: {
           S: messageId,
         },
