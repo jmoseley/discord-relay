@@ -60,6 +60,7 @@ export default class DiscordMessageHandler {
       author: message.author.username,
       channelId: message.channel.id,
       createdTimestamp: message.createdTimestamp,
+      isMentioned: message.isMentioned(this.discordClient.user.id),
       message: message.content,
     };
   }
