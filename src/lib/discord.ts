@@ -57,7 +57,8 @@ export default class DiscordMessageHandler {
 
   private getMessageData(message: Discord.Message): any {
     return {
-      author: message.author.username,
+      authorId: message.author.id,
+      authorUsername: message.author.username,
       channelId: message.channel.id,
       createdTimestamp: message.createdTimestamp,
       isMentioned: message.isMentioned(this.discordClient.user.id),
