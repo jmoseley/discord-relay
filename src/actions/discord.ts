@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import { DiscordBotsDAO, IToken } from '../dao';
+import { DiscordBotsDAO, DiscordMessageDAO, IToken } from '../dao';
 import DiscordMessageHandler from '../lib/discord';
 import createLogger from '../lib/logger';
 
@@ -16,7 +16,10 @@ export class DiscordClientActions {
     [key: string]: DiscordMessageHandler;
   };
 
-  constructor(private readonly discordTokenDao: DiscordBotsDAO) {
+  constructor(
+    private readonly discordTokenDao: DiscordBotsDAO,
+    private readonly discordMessageDao: DiscordMessageDAO,
+  ) {
     this.activeClients = {};
   }
 
@@ -81,7 +84,7 @@ export class DiscordClientActions {
   private async startClient(token: IToken): Promise<DiscordMessageHandler | null> {
     LOG.info(`Starting client for token ${_.truncate(token.token, { length: 10 })}`);
 
-    const messageHandler = new DiscordMessageHandler(token);
+    const messageHandler = new DiscordMessageHandler(this.discordMessageDao, token);
     await messageHandler.start();
 
     return messageHandler;

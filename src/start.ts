@@ -40,8 +40,9 @@ async function start(): Promise<void> {
   const dynamoDB = new AWS.DynamoDB({
     region: 'us-west-2',
   });
+  const discordMessageDAO = new daos.DiscordMessageDAO(dynamoDB);
   const discordBotsDAO = new daos.DiscordBotsDAO(dynamoDB);
-  const discordClientActions = new actions.DiscordClientActions(discordBotsDAO);
+  const discordClientActions = new actions.DiscordClientActions(discordBotsDAO, discordMessageDAO);
 
   const authProvider = new AuthProvider(dynamoDB);
 
