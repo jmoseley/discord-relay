@@ -23,12 +23,14 @@ html
             th Token
             th Web Hook URL
             th Method
+            th Messages Sent
             th 
           each bot in bots
             tr
               td= bot.token
               td= bot.webhookUri
               td= bot.method
+              td= bot.messagesSent
               td
                 a(href=`/bot/remove?tokenId=${bot.tokenId}`) Remove
       form(action='/bot/add' method='POST')
