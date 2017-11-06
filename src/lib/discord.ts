@@ -5,6 +5,7 @@ import * as url from 'url';
 import * as uuid from 'uuid';
 
 import { IToken } from '../actions/discord';
+import { DiscordMessageDAO } from '../dao';
 import createLogger, { Logger } from './logger';
 
 export default class DiscordMessageHandler {
@@ -12,6 +13,7 @@ export default class DiscordMessageHandler {
   private log: Logger;
 
   constructor(
+    private readonly discordMessageDao: DiscordMessageDAO,
     public readonly token: IToken,
   ) {
     this.log = createLogger(`DiscordMessageHandler(${token.token})`);
@@ -51,6 +53,8 @@ export default class DiscordMessageHandler {
         headers: this.token.headers,
         method: this.token.method,
         qs,
+      }).then(async () => {
+        await this.discordMessageDao.persistMessage(this.token, message);
       });
     });
   }

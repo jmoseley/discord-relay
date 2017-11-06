@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import * as autobind from 'protobind';
 import * as querystring from 'querystring';
 
-import { DiscordClientActions, IToken } from '../actions';
+import { DiscordClientActions, IMessage, IToken } from '../actions';
 import createLogger from '../lib/logger';
 
 const LOG = createLogger('PageHandler');
@@ -31,14 +31,15 @@ export class PageHandler {
       // state: '123456', // TODO: Change this to something uique to the user.
     };
 
-    let bots: IToken[] = [];
+    let bots: any  = [];
     if (req.user) {
       bots = _.map(
         await this.discordClientActions.getUserTokens(req.user.userId),
         bot => {
           return {
-            ...bot,
-            token: _.truncate(bot.token, { length: 10 }),
+            ...bot.token,
+            messagesSent: bot.messages.length,
+            token: _.truncate(bot.token.token, { length: 10 }),
           };
         },
       );
