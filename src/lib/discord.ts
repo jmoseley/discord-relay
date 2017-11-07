@@ -37,6 +37,13 @@ export default class DiscordMessageHandler {
     });
 
     this.discordClient.on('message', (message: Discord.Message) => {
+      // Do not trigger for messages that this bot sent.
+      // Prevents feedback loops.
+      if (message.author.id === this.discordClient.user.id) {
+        this.log.info(`Dropping message because it came from the bot.`);
+        return;
+      }
+
       this.log.info(`Triggering webhook for message '${message.content}' to '${this.token.webhookUri}'`);
 
       let body: any;
