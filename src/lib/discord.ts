@@ -5,7 +5,7 @@ import * as url from 'url';
 import * as uuid from 'uuid';
 
 import { IToken } from '../actions/discord';
-import { DiscordMessageDAO } from '../dao';
+import { DiscordMessageDAO, MessageType } from '../dao';
 import createLogger, { Logger } from './logger';
 
 export default class DiscordMessageHandler {
