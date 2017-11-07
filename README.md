@@ -29,7 +29,7 @@ yarn start
 Uses `forever` and `nodemon` to restart after changes and errors.
 
 ```bash
-yarn dev
+DISCORD_CLIENT_ID=<value> DISCORD_CLIENT_SECRET=<value> DISCORD_OAUTH_REDIRECT_URI=<value> COOKIE_SECRET='123456' yarn dev
 ```
 
 ## Deploy

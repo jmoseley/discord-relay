@@ -19,13 +19,29 @@ export interface IMessage {
   tokenId: string;
 }
 
+export enum MessageType {
+  INCOMING = 'INCOMING',
+  OUTGOING = 'OUTGOING',
+}
+
 export class DiscordMessageDAO {
   constructor(private readonly dynamoDB: AWS.DynamoDB) {}
 
   public async persistMessage(
     token: IToken,
-    message: Discord.Message,
-  ): Promise<void> {
+    message: {
+      author: {
+        id: string;
+        username: string;
+      },
+      channel: {
+        id: string,
+      },
+      createdTimestamp: number,
+    },
+    type: MessageType,
+    sourceMessageId?: string,
+  ): Promise<string> {
     const messageId = uuid.v4();
 
     await this.dynamoDB.putItem({
@@ -42,6 +58,9 @@ export class DiscordMessageDAO {
         messageId: {
           S: messageId,
         },
+        messageType: {
+          S: type,
+        },
         timestamp: {
           N: message.createdTimestamp.toString(),
         },
@@ -51,6 +70,8 @@ export class DiscordMessageDAO {
       },
       TableName: TABLE_NAME,
     }, undefined).promise();
+
+    return messageId;
   }
 
   public async getMessagesForToken(tokenId: string): Promise<IMessage[]> {
