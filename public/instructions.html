@@ -10,14 +10,24 @@
       Go to the <a href="https://discordapp.com/developers/applications/me">Discord Developers</a> page, and click "New App". Give your app a name. You don't need to worry about any Redirect URLs for bot users.
     </p>
     <h3>Step 2: Create a Bot User</h3>
-    Click the "Create a Bot User" button.
+    <p>Click the "Create a Bot User" button.</p>
     <h3>Step 3: Add the bot to some channels</h3>
-    Get the Client ID for your app (underneath App Details). Visit 'http://discord-relay.jeremymoseley.net/bot/auth?clientId=:your clientId:'. This will forward you to the URL to add your bot to the page. This action does not give DiscordRelay any permissions to post or access your channels, it's just to help you get your bot added to your channels.
+    <p>Get the Client ID for your app (underneath App Details). Visit 'http://discord-relay.jeremymoseley.net/bot/auth?clientId=:your clientId:'. This will forward you to the URL to add your bot to the page. This action does not give DiscordRelay any permissions to post or access your channels, it's just to help you get your bot added to your channels.</p>
     <h3>Step 4: Login</h3>
     Login to DiscordRelay using Discord on the main page.
     <h3>Step 5: Set up your webhook</h3>
-    Get your bot token from your Discord Application page (underneath App Bot User). Paste this token in the form and add your web hook url. This must be a well formed URL including the protocol (ie 'http://').
+    <p>Get your bot token from your Discord Application page (underneath App Bot User). Paste this token in the form and add your web hook url. This must be a well formed URL including the protocol (ie 'http://').</p>
     <h3>Step 6: Your ready to go!</h3>
-    You should be receiving calls to the webhook with messages.
+    <p>You should be receiving calls to the webhook with messages.</p>
+    <p>The following parameters will be included with the webhook call:</p>
+    <ul>
+      <li>authorId</li>
+      <li>authorUsername</li>
+      <li>channelId</li>
+      <li>messageId</li>
+      <li>timestamp</li>
+      <li>tokenId</li>
+    </ul>
+    <p>If the method for your webhook is GET, these will be passed as part of the querystring. If the method is POST these will be passed as part of the JSON body.</p>
   </body>
 </html>
