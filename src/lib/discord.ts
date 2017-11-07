@@ -58,10 +58,22 @@ export default class DiscordMessageHandler {
       request(this.token.webhookUri, {
         body,
         headers: this.token.headers,
+        json: true,
         method: this.token.method,
         qs,
-      }).then(async () => {
-        await this.discordMessageDao.persistMessage(this.token, message);
+      }).then(async response => {
+        const messageId = await this.discordMessageDao.persistMessage(this.token, message, MessageType.INCOMING);
+        const outgoingMessage = _.get(response, 'message');
+        if (outgoingMessage) {
+          this.log.info(`Sending response '${outgoingMessage}'.`);
+          await message.channel.send(outgoingMessage);
+          await this.discordMessageDao.persistMessage(
+            this.token, {
+              author: this.discordClient.user,
+              channel: message.channel,
+              createdTimestamp: Date.now(),
+            }, MessageType.OUTGOING);
+        }
       });
     });
   }
