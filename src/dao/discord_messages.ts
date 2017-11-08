@@ -25,7 +25,7 @@ export enum MessageType {
 
 export class DiscordMessageDAO extends BaseDAO<IMessage> {
   constructor(dynamoDB: AWS.DynamoDB) {
-    super('DiscordRelay.Messages', dynamoDB);
+    super('DiscordRelay.Messages', dynamoDB, 'tokenId', 'S', 'messageId', 'S');
   }
 
   public async persistMessage(

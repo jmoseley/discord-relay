@@ -26,7 +26,7 @@ export interface IToken extends ISchema {
 // TODO: Build a DAO helper that handles conversion to dynamo DB and back.
 export class DiscordBotsDAO extends BaseDAO<IToken> {
   constructor(dynamoDB: AWS.DynamoDB) {
-    super('DiscordRelay.BotTokens', dynamoDB);
+    super('DiscordRelay.BotTokens', dynamoDB, 'tokenId', 'S');
     autobind(this);
   }
 
