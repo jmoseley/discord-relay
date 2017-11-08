@@ -76,31 +76,6 @@ export class UsersDAO extends BaseDAO<IDiscordUserDetails> {
     };
   }
 
-  private async getUserWithDiscordId(discordUserId: string): Promise<IDiscordUser | null> {
-    LOG.info(`Looing up user with discordUserId ${discordUserId}`);
-    const result = await this.dynamoDB.scan({
-      ExpressionAttributeValues: {
-        ':duid': {
-          S: discordUserId,
-        },
-      },
-      FilterExpression: 'discordUserId = :duid',
-      Select: 'ALL_ATTRIBUTES',
-      TableName: this.tableName,
-    }, undefined).promise();
-
-    if (!result.Items || !result.Items.length) {
-      return null;
-    }
-
-    return {
-      // This typecasting is bullshit.
-      email: result.Items[0].email.S as string,
-      userId: result.Items[0].userId.S as string,
-      username: result.Items[0].username.S as string,
-    };
-  }
-
   public async getUser(userId: string): Promise<IDiscordUser | null> {
     if (!userId) {
       return null;
@@ -125,6 +100,31 @@ export class UsersDAO extends BaseDAO<IDiscordUserDetails> {
       // This typecasting is bullshit.
       email: result.Items[0].email.S as string,
       userId,
+      username: result.Items[0].username.S as string,
+    };
+  }
+
+  private async getUserWithDiscordId(discordUserId: string): Promise<IDiscordUser | null> {
+    LOG.info(`Looing up user with discordUserId ${discordUserId}`);
+    const result = await this.dynamoDB.scan({
+      ExpressionAttributeValues: {
+        ':duid': {
+          S: discordUserId,
+        },
+      },
+      FilterExpression: 'discordUserId = :duid',
+      Select: 'ALL_ATTRIBUTES',
+      TableName: this.tableName,
+    }, undefined).promise();
+
+    if (!result.Items || !result.Items.length) {
+      return null;
+    }
+
+    return {
+      // This typecasting is bullshit.
+      email: result.Items[0].email.S as string,
+      userId: result.Items[0].userId.S as string,
       username: result.Items[0].username.S as string,
     };
   }

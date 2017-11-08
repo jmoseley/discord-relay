@@ -47,8 +47,10 @@ async function start(): Promise<void> {
   const discordBotsDAO = new daos.DiscordBotsDAO(dynamoDB);
   const usersDAO = new daos.UsersDAO(dynamoDB);
 
-  const discordClientActions = new actions.DiscordClientActions(discordBotsDAO, discordMessageDAO);
+  const migrator = new daos.Migrator(discordMessageDAO, discordBotsDAO, usersDAO);
+  await migrator.createTables();
 
+  const discordClientActions = new actions.DiscordClientActions(discordBotsDAO, discordMessageDAO);
   const authProvider = new AuthProvider(usersDAO);
 
   const statusHandler = new handlers.StatusHandler();
