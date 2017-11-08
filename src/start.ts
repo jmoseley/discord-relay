@@ -8,6 +8,7 @@ import * as actions from './actions';
 import * as daos from './dao';
 import * as handlers from './handlers';
 import AuthProvider from './lib/auth_provider';
+import * as config from './lib/config';
 import createLogger from './lib/logger';
 
 // I suck at types.
@@ -23,6 +24,10 @@ const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
 const DISCORD_OAUTH_REDIRECT_URI = process.env.DISCORD_OAUTH_REDIRECT_URI;
 const COOKIE_SECRET = process.env.COOKIE_SECRET;
 
+if (config.isLocalDev()) {
+  LOG.info(`----- Running in DEV mode -----`);
+}
+
 async function start(): Promise<void> {
   if (!DISCORD_CLIENT_ID || !DISCORD_CLIENT_SECRET || !DISCORD_OAUTH_REDIRECT_URI) {
     LOG.error('Must set Discord ClientId, ClientSecret, and RedirectURI.');
@@ -37,9 +42,7 @@ async function start(): Promise<void> {
     });
   }, 5 * 60 * 1000); // 5 minutes
 
-  const dynamoDB = new AWS.DynamoDB({
-    region: 'us-west-2',
-  });
+  const dynamoDB = getDynamoDB();
   const discordMessageDAO = new daos.DiscordMessageDAO(dynamoDB);
   const discordBotsDAO = new daos.DiscordBotsDAO(dynamoDB);
   const discordClientActions = new actions.DiscordClientActions(discordBotsDAO, discordMessageDAO);
@@ -94,3 +97,14 @@ async function start(): Promise<void> {
 start().catch((error: any) => {
   LOG.error(error);
 });
+
+function getDynamoDB(): AWS.DynamoDB {
+  const options: AWS.DynamoDB.Types.ClientConfiguration = {
+    region: 'us-west-2',
+  };
+  if (config.isLocalDev()) {
+    options.region = 'localhost';
+    options.endpoint = 'http://localhost:8000';
+  }
+  return new AWS.DynamoDB(options);
+}

@@ -7,6 +7,8 @@ yarn-error.log*
 
 dist
 
+dynamodb_local_latest
+
 # Runtime data
 pids
 *.pid
