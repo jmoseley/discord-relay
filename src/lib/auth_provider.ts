@@ -3,6 +3,7 @@ import { NextFunction, Response } from 'express';
 import * as _ from 'lodash';
 import * as uuid from 'uuid';
 
+import { UsersDAO } from '../dao';
 import createLogger from './logger';
 
 const LOG = createLogger('AuthProvider');
@@ -30,121 +31,19 @@ export interface IOAuthTokens {
 }
 
 // TODO: Consolidate logic for Discord OAuth and this logic.
-// Woah woah, why dosen't this have a DAO!?!
 export default class AuthProvider {
-  constructor(private readonly dynamoDb: AWS.DynamoDB) {}
+  constructor(private readonly usersDAO: UsersDAO) {}
 
   public middleware() {
     // Req is a Request, but need to use any so we can assign stuff to it.
     return (req: any, response: Response, next: NextFunction) => {
       const userId = _.get(req.signedCookies, 'userId');
-      this.getUser(userId).then(user => {
+      this.usersDAO.getUser(userId).then(user => {
         req.user = user;
         next();
       }).catch((err: any) => {
         next(err);
       });
-    };
-  }
-
-  public async getDiscordUser(userDetails: IDiscordUser): Promise<IDiscordUser | null> {
-    return null;
-  }
-
-  public async addUser(authDetails: IOAuthTokens, userDetails: IDiscordUserDetails): Promise<IDiscordUser> {
-    // Try to find an existing user first.
-    const existingUser = await this.getUserWithDiscordId(userDetails.id);
-
-    let userId = uuid.v4();
-    if (existingUser) {
-      // Ensure the user gets updated.
-      userId = existingUser.userId;
-    }
-
-    await this.dynamoDb.putItem({
-      Item: {
-        accessToken: {
-          S: authDetails.accessToken,
-        },
-        discordUserId: {
-          S: userDetails.id,
-        },
-        email: {
-          S: userDetails.email,
-        },
-        expiresAt: {
-          S: authDetails.expiresAt.toISOString(),
-        },
-        refreshToken: {
-          S: authDetails.refreshToken,
-        },
-        userId: {
-          S: userId,
-        },
-        username: {
-          S: userDetails.username,
-        },
-      },
-      TableName: TABLE_NAME,
-    }, undefined).promise();
-
-    return {
-      email: userDetails.email,
-      userId,
-      username: userDetails.username,
-    };
-  }
-
-  private async getUserWithDiscordId(discordUserId: string): Promise<IDiscordUser | null> {
-    LOG.info(`Looing up user with discordUserId ${discordUserId}`);
-    const result = await this.dynamoDb.scan({
-      ExpressionAttributeValues: {
-        ':duid': {
-          S: discordUserId,
-        },
-      },
-      FilterExpression: 'discordUserId = :duid',
-      Select: 'ALL_ATTRIBUTES',
-      TableName: TABLE_NAME,
-    }, undefined).promise();
-
-    if (!result.Items || !result.Items.length) {
-      return null;
-    }
-
-    return {
-      // This typecasting is bullshit.
-      email: result.Items[0].email.S as string,
-      userId: result.Items[0].userId.S as string,
-      username: result.Items[0].username.S as string,
-    };
-  }
-
-  private async getUser(userId: string): Promise<IDiscordUser | null> {
-    if (!userId) {
-      return null;
-    }
-
-    const result = await this.dynamoDb.query({
-      ExpressionAttributeValues: {
-        ':uid': {
-          S: userId,
-        },
-      },
-      KeyConditionExpression: 'userId = :uid',
-      Select: 'ALL_ATTRIBUTES',
-      TableName: TABLE_NAME,
-    }, undefined).promise();
-
-    if (!result.Items || !result.Items.length) {
-      return null;
-    }
-
-    return {
-      // This typecasting is bullshit.
-      email: result.Items[0].email.S as string,
-      userId,
-      username: result.Items[0].username.S as string,
     };
   }
 }

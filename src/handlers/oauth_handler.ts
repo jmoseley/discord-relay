@@ -3,7 +3,7 @@ import * as moment from 'moment';
 import * as autobind from 'protobind';
 import * as request from 'request-promise-native';
 
-import AuthProvider from '../lib/auth_provider';
+import { UsersDAO } from '../dao';
 import createLogger from '../lib/logger';
 
 const DISCORD_TOKEN_URL = 'https://discordapp.com/api/oauth2/token';
@@ -13,7 +13,7 @@ const LOG = createLogger('OAuthHandler');
 
 export class OAuthHandler {
   constructor(
-    private readonly authProvider: AuthProvider,
+    private readonly usersDAO: UsersDAO,
     private readonly clientId?: string,
     private readonly clientSecret?: string,
     private readonly oauthRedirectUri?: string,
@@ -46,7 +46,7 @@ export class OAuthHandler {
       json: true,
     });
 
-    const user = await this.authProvider.addUser({
+    const user = await this.usersDAO.addUser({
       accessToken: authTokens.access_token,
       expiresAt: moment().add(authTokens.expires_in, 'seconds').toDate(),
       refreshToken: authTokens.refresh_token,
