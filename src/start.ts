@@ -45,15 +45,17 @@ async function start(): Promise<void> {
   const dynamoDB = getDynamoDB();
   const discordMessageDAO = new daos.DiscordMessageDAO(dynamoDB);
   const discordBotsDAO = new daos.DiscordBotsDAO(dynamoDB);
+  const usersDAO = new daos.UsersDAO(dynamoDB);
+
   const discordClientActions = new actions.DiscordClientActions(discordBotsDAO, discordMessageDAO);
 
-  const authProvider = new AuthProvider(dynamoDB);
+  const authProvider = new AuthProvider(usersDAO);
 
   const statusHandler = new handlers.StatusHandler();
   const discordClientHandler = new handlers.DiscordClientConfigurationHandler(discordClientActions);
   const pageHandler = new handlers.PageHandler(discordClientActions, DISCORD_CLIENT_ID, DISCORD_OAUTH_REDIRECT_URI);
   const oauthHandler = new handlers.OAuthHandler(
-    authProvider,
+    usersDAO,
     DISCORD_CLIENT_ID,
     DISCORD_CLIENT_SECRET,
     DISCORD_OAUTH_REDIRECT_URI,
