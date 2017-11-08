@@ -4,16 +4,15 @@ import * as autobind from 'protobind';
 import * as uuid from 'uuid';
 
 import createLogger from '../lib/logger';
+import BaseDAO, { ISchema } from './base';
 
 const LOG = createLogger('DiscordBotsDAO');
-
-const TABLE_NAME = 'DiscordRelay.BotTokens';
 
 export interface ITokenSearchParams {
   userId: string;
 }
 
-export interface IToken {
+export interface IToken extends ISchema {
   headers: {
     [key: string]: string,
   };
@@ -25,15 +24,16 @@ export interface IToken {
 }
 
 // TODO: Build a DAO helper that handles conversion to dynamo DB and back.
-export class DiscordBotsDAO {
-  constructor(private readonly dynamoDB: AWS.DynamoDB) {
+export class DiscordBotsDAO extends BaseDAO<IToken> {
+  constructor(dynamoDB: AWS.DynamoDB) {
+    super('DiscordRelay.BotTokens', dynamoDB);
     autobind(this);
   }
 
   public async getAllTokenHooks(): Promise<IToken[]> {
     // TODO: Typing.
     const tokensResult = await this.dynamoDB.scan({
-      TableName: TABLE_NAME,
+      TableName: this.tableName,
     }).promise();
 
     return _.map(tokensResult.Items, this.mapTokenItemToToken);
@@ -46,7 +46,7 @@ export class DiscordBotsDAO {
           S: tokenId,
         },
       },
-      TableName: TABLE_NAME,
+      TableName: this.tableName,
     }, undefined).promise();
 
     if (!result.Item) {
@@ -63,7 +63,7 @@ export class DiscordBotsDAO {
           S: tokenId,
         },
       },
-      TableName: TABLE_NAME,
+      TableName: this.tableName,
     }, undefined).promise();
   }
 
@@ -75,7 +75,7 @@ export class DiscordBotsDAO {
         },
       },
       FilterExpression: 'userId = :uid',
-      TableName: TABLE_NAME,
+      TableName: this.tableName,
     }).promise();
 
     return _.map(result.Items, this.mapTokenItemToToken);
@@ -121,7 +121,7 @@ export class DiscordBotsDAO {
           S: webhookUri,
         },
       },
-      TableName: TABLE_NAME,
+      TableName: this.tableName,
     }, undefined).promise();
 
     const parsedHeaders = _.merge({},
@@ -146,7 +146,7 @@ export class DiscordBotsDAO {
         },
       },
       FilterExpression: 'tokenString = :tok',
-      TableName: TABLE_NAME,
+      TableName: this.tableName,
     }, undefined).promise();
 
     if (!_.get(result.Items, 'length')) {
