@@ -6,6 +6,8 @@ if [ ! -f "$nodemon_cmd" ]; then
   ( cd ./scripts && yarn )
 fi
 
+export DEV=1
+
 set -x
 $nodemon_cmd \
   --ext ts \
