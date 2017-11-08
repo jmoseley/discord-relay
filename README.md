@@ -28,6 +28,12 @@ yarn start
 
 Uses `forever` and `nodemon` to restart after changes and errors.
 
+First, download and start DynamoDB locally:
+
+http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html#DynamoDBLocal.DownloadingAndRunning
+
+Start DynamodDB: `java -Djava.library.path=./dynamodb_local_latest/DynamoDBLocal_lib -jar ./dynamodb_local_latest/DynamoDBLocal.jar -inMemory`
+
 ```bash
 DISCORD_CLIENT_ID=<value> DISCORD_CLIENT_SECRET=<value> DISCORD_OAUTH_REDIRECT_URI=<value> COOKIE_SECRET='123456' yarn dev
 ```

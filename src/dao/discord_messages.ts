@@ -4,13 +4,12 @@ import * as _ from 'lodash';
 import * as uuid from 'uuid';
 
 import createLogger from '../lib/logger';
+import BaseDAO, { ISchema } from './base';
 import { IToken } from './discord_bots';
 
 const LOG = createLogger('DiscordMessageDAO');
 
-const TABLE_NAME = 'DiscordRelay.Messages';
-
-export interface IMessage {
+export interface IMessage extends ISchema {
   authorId: string;
   authorUsername: string;
   channelId: string;
@@ -24,8 +23,10 @@ export enum MessageType {
   OUTGOING = 'OUTGOING',
 }
 
-export class DiscordMessageDAO {
-  constructor(private readonly dynamoDB: AWS.DynamoDB) {}
+export class DiscordMessageDAO extends BaseDAO<IMessage> {
+  constructor(dynamoDB: AWS.DynamoDB) {
+    super('DiscordRelay.Messages', dynamoDB, 'tokenId', 'S', 'messageId', 'S');
+  }
 
   public async persistMessage(
     token: IToken,
@@ -68,7 +69,7 @@ export class DiscordMessageDAO {
           S: token.tokenId,
         },
       },
-      TableName: TABLE_NAME,
+      TableName: this.tableName,
     }, undefined).promise();
 
     return messageId;
@@ -82,7 +83,7 @@ export class DiscordMessageDAO {
         },
       },
       KeyConditionExpression: 'tokenId = :tokid',
-      TableName: TABLE_NAME,
+      TableName: this.tableName,
     }, undefined).promise();
 
     return _.map(results.Items, this.mapItemToMessage);
