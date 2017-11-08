@@ -29,7 +29,7 @@ export interface IOAuthTokens {
 
 export class UsersDAO extends BaseDAO<IDiscordUserDetails> {
   constructor(dynamoDB: AWS.DynamoDB) {
-    super('DiscordRelay.DiscordUsers', dynamoDB);
+    super('DiscordRelay.DiscordUsers', dynamoDB, 'userId', 'S');
   }
 
   public async addUser(authDetails: IOAuthTokens, userDetails: IDiscordUserDetails): Promise<IDiscordUser> {
