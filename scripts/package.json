@@ -6,6 +6,7 @@
   "author": "",
   "license": "UNLICENSED",
   "devDependencies": {
+    "forever": "^0.15.3",
     "nodemon": "^1.12.1"
   }
 }

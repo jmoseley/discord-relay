@@ -1,15 +1,11 @@
 #!/usr/bin/env bash
-set -e
 
 nodemon_cmd="./scripts/node_modules/.bin/nodemon"
 if [ ! -f "$nodemon_cmd" ]; then
   ( cd ./scripts && yarn )
 fi
 
-export DEV=1
-
-set -x
 $nodemon_cmd \
   --ext ts \
   --watch src \
-  --exec "tslint -p tslint.json && tsc && node dist/start"
+  --exec 'tslint -p tslint.json && tsc && node dist/start.js'

@@ -7,8 +7,8 @@
   "author": "Jeremy Moseley <jeremy@jeremymoseley.com>",
   "license": "MIT",
   "scripts": {
-    "start": "./scripts/start",
-    "dev": "forever --minUptime 1000 --spinSleepTime 1000 -c './scripts/start_dev' dist/start.js"
+    "start": "./scripts/start.sh",
+    "dev": "./scripts/start_dev.sh"
   },
   "dependencies": {
     "@types/cookie-parser": "^1.4.1",
@@ -26,7 +26,6 @@
     "erlpack": "hammerandchisel/erlpack",
     "express": "^4.16.2",
     "express-promise-router": "^2.0.0",
-    "forever": "^0.15.3",
     "lodash": "^4.17.4",
     "moment": "^2.19.1",
     "protobind": "^1.0.7",
