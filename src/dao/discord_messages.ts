@@ -12,15 +12,18 @@ const LOG = createLogger('DiscordMessageDAO');
 export interface IMessage extends ISchema {
   authorId: string;
   authorUsername: string;
-  channelId: string;
+  channelId?: string;
   messageId: string;
   timestamp: number;
   tokenId: string;
+  messageType?: string;
+  eventName?: string;
 }
 
 export enum MessageType {
   INCOMING = 'INCOMING',
   OUTGOING = 'OUTGOING',
+  EVENT = 'EVENT',
 }
 
 export class DiscordMessageDAO extends BaseDAO<IMessage> {
@@ -30,31 +33,22 @@ export class DiscordMessageDAO extends BaseDAO<IMessage> {
 
   public async persistMessage(
     token: IToken,
-    message: {
-      author: {
-        id: string;
-        username: string;
-      },
-      channel: {
-        id: string,
-      },
-      createdTimestamp: number,
-    },
+    authorId: string,
+    authorUsername: string,
+    timestamp: number,
     type: MessageType,
-    sourceMessageId?: string,
+    channelId?: string,
+    eventName?: string,
   ): Promise<string> {
     const messageId = uuid.v4();
 
-    await this.dynamoDB.putItem({
+    const data: { Item: { [key: string]: AWS.DynamoDB.AttributeValue }, TableName: string } = {
       Item: {
         authorId: {
-          S: message.author.id,
+          S: authorId,
         },
         authorUsername: {
-          S: message.author.username,
-        },
-        channelId: {
-          S: message.channel.id,
+          S: authorUsername,
         },
         messageId: {
           S: messageId,
@@ -63,19 +57,32 @@ export class DiscordMessageDAO extends BaseDAO<IMessage> {
           S: type,
         },
         timestamp: {
-          N: message.createdTimestamp.toString(),
+          N: timestamp.toString(),
         },
         tokenId: {
           S: token.tokenId,
         },
       },
       TableName: this.tableName,
-    }, undefined).promise();
+    };
+
+    if (eventName) {
+      data.Item.eventName = {
+        S: eventName,
+      };
+    }
+    if (channelId) {
+      data.Item.channelId = {
+        S: channelId,
+      };
+    }
+
+    await this.dynamoDB.putItem(data, undefined).promise();
 
     return messageId;
   }
 
-  public async getMessagesForToken(tokenId: string): Promise<IMessage[]> {
+  public async getMessagesForToken(tokenId: string): Promise<IMessage[] > {
     const results = await this.dynamoDB.query({
       ExpressionAttributeValues: {
         ':tokid': {
@@ -92,12 +99,13 @@ export class DiscordMessageDAO extends BaseDAO<IMessage> {
   private mapItemToMessage(
     item: { [key: string]: AWS.DynamoDB.AttributeValue },
   ): IMessage {
-    LOG.info(JSON.stringify(item, null, 2));
     return {
       authorId: item.authorId.S as string,
       authorUsername: item.authorUsername.S as string,
-      channelId: item.channelId.S as string,
+      channelId: _.get(item, 'channelId.S') as string,
+      eventName: _.get(item, 'eventName.S') as string,
       messageId: item.messageId.S as string,
+      messageType: _.get(item, 'messageType.S') as string,
       timestamp: parseInt(item.timestamp.N as string, 10),
       tokenId: item.tokenId.S as string,
     };
