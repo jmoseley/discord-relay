@@ -44,9 +44,6 @@ export default class DiscordMessageHandler {
       username: newMember.user.username,
     };
 
-    this.log.info(_.get(newMember.presence, 'game.name'));
-    this.log.info(newMember.presence.status);
-
     request(this.token.webhookUri, {
       body: this.token.method === 'POST' ? data : undefined,
       headers: this.token.headers,
