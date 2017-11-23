@@ -61,9 +61,14 @@ export default class DiscordMessageHandler {
         'presenceUpdate',
       );
       const outgoingMessage = _.get(response, 'message');
+      const sendToChannelId = _.get(response, 'channelId');
       if (outgoingMessage) {
         this.log.info(`Sending response '${outgoingMessage}'.`);
         for (const [channelId, channel] of this.discordClient.channels) {
+          if (sendToChannelId && channelId !== sendToChannelId) {
+            continue;
+          }
+
           let textChannel: Discord.TextChannel;
           if (channel.type === 'text') {
             textChannel = channel as Discord.TextChannel;
